@@ -1,0 +1,90 @@
+/* styles/components/card.css */
+.card {
+    width: var(--card-width);
+    height: var(--card-height);
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-md);
+    color: var(--color-black);
+    font-weight: bold;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    transition: transform var(--transition-normal);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card.red {
+    color: #dc143c;
+}
+
+.card.black {
+    color: var(--color-black);
+}
+
+.card-top, .card-bottom {
+    font-size: var(--font-size-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.card-bottom {
+    align-items: flex-end;
+    transform: rotate(180deg);
+}
+
+.card-center {
+    font-size: var(--font-size-2xl);
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-back {
+    background: linear-gradient(45deg, #dc143c, var(--color-secondary));
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xs);
+}
+
+.card-back::before {
+    content: "BJ";
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+}
+
+.card-dealing {
+    animation: dealCard 0.5s ease-out;
+}
+
+@keyframes dealCard {
+    0% {
+        transform: translateY(-100px) rotate(-10deg);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) rotate(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        width: var(--card-width-mobile);
+        height: var(--card-height-mobile);
+    }
+    
+    .card-center {
+        font-size: var(--font-size-xl);
+    }
+}

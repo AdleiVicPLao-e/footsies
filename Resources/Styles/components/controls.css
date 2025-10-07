@@ -1,0 +1,81 @@
+/* styles/components/controls.css */
+.controls {
+    text-align: center;
+    padding: var(--space-xl);
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+}
+
+.controls h3 {
+    margin-bottom: var(--space-lg);
+    color: var(--color-accent);
+}
+
+.buttons-container {
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: var(--space-md) var(--space-xl);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 120px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-hit {
+    background: linear-gradient(45deg, var(--color-success), #45a049);
+    color: var(--color-white);
+}
+
+.btn-stand {
+    background: linear-gradient(45deg, var(--color-warning), #f57c00);
+    color: var(--color-white);
+}
+
+.btn-next {
+    background: linear-gradient(45deg, var(--color-info), #1976D2);
+    color: var(--color-white);
+}
+
+.btn-reset {
+    background: linear-gradient(45deg, var(--color-danger), #d32f2f);
+    color: var(--color-white);
+}
+
+.btn:disabled {
+    background: var(--color-gray-dark);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    .buttons-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 200px;
+    }
+}

@@ -1,0 +1,100 @@
+/* styles/components/difficulty-options.css */
+.difficulty-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.difficulty-option {
+    cursor: pointer;
+    text-align: center;
+}
+
+.difficulty-option input[type="radio"] {
+    display: none;
+}
+
+.difficulty-badge {
+    display: block;
+    padding: var(--space-md) var(--space-lg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    font-weight: bold;
+    transition: all var(--transition-normal);
+    text-transform: uppercase;
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.5px;
+}
+
+.difficulty-option input[type="radio"]:checked + .difficulty-badge {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Difficulty Colors */
+.difficulty-easy {
+    background: color-mix(in srgb, var(--difficulty-easy) 20%, transparent);
+    border-color: var(--difficulty-easy);
+    color: var(--difficulty-easy);
+}
+
+.difficulty-option input[type="radio"]:checked + .difficulty-easy {
+    background: var(--difficulty-easy);
+    color: var(--color-white);
+}
+
+.difficulty-medium {
+    background: color-mix(in srgb, var(--difficulty-medium) 20%, transparent);
+    border-color: var(--difficulty-medium);
+    color: var(--difficulty-medium);
+}
+
+.difficulty-option input[type="radio"]:checked + .difficulty-medium {
+    background: var(--difficulty-medium);
+    color: var(--color-white);
+}
+
+.difficulty-hard {
+    background: color-mix(in srgb, var(--difficulty-hard) 20%, transparent);
+    border-color: var(--difficulty-hard);
+    color: var(--difficulty-hard);
+}
+
+.difficulty-option input[type="radio"]:checked + .difficulty-hard {
+    background: var(--difficulty-hard);
+    color: var(--color-white);
+}
+
+.difficulty-random {
+    background: color-mix(in srgb, var(--difficulty-random) 20%, transparent);
+    border-color: var(--difficulty-random);
+    color: var(--difficulty-random);
+}
+
+.difficulty-option input[type="radio"]:checked + .difficulty-random {
+    background: var(--difficulty-random);
+    color: var(--color-white);
+}
+
+.difficulty-adaptive {
+    background: color-mix(in srgb, var(--difficulty-adaptive) 20%, transparent);
+    border-color: var(--difficulty-adaptive);
+    color: var(--difficulty-adaptive);
+}
+
+.difficulty-option input[type="radio"]:checked + .difficulty-adaptive {
+    background: var(--difficulty-adaptive);
+    color: var(--color-white);
+}
+
+.difficulty-mixed {
+    background: color-mix(in srgb, var(--difficulty-mixed) 20%, transparent);
+    border-color: var(--difficulty-mixed);
+    color: var(--difficulty-mixed);
+}
+
+.difficulty-option input[type="radio"]:checked + .difficulty-mixed {
+    background: var(--difficulty-mixed);
+    color: var(--color-white);
+}

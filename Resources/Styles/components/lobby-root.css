@@ -1,0 +1,28 @@
+/* styles/components/lobby-root.css */
+:root {
+    /* Lobby Specific Colors */
+    --lobby-bg-primary: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+    --lobby-bg-card: rgba(255, 255, 255, 0.95);
+    --lobby-bg-overlay: rgba(0, 0, 0, 0.1);
+    --lobby-border-color: #5c6bc0;
+    --lobby-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    
+    /* Difficulty Colors */
+    --difficulty-easy: #4caf50;
+    --difficulty-medium: #ff9800;
+    --difficulty-hard: #f44336;
+    --difficulty-random: #9c27b0;
+    --difficulty-adaptive: #2196f3;
+    --difficulty-mixed: #607d8b;
+    
+    /* Button Colors */
+    --btn-primary-bg: linear-gradient(45deg, #5c6bc0, #3949ab);
+    --btn-primary-hover: linear-gradient(45deg, #3949ab, #303f9f);
+    --btn-secondary-bg: linear-gradient(45deg, #78909c, #546e7a);
+    --btn-secondary-hover: linear-gradient(45deg, #546e7a, #455a64);
+    
+    /* Status Colors */
+    --status-ready: #4caf50;
+    --status-waiting: #ff9800;
+    --status-error: #f44336;
+}

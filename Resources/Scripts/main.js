@@ -1,269 +1,342 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Game elements
-    const arena = document.querySelector('.arena');
-    const playerFighter = document.querySelector('.fighter.player');
-    const enemyFighter = document.querySelector('.fighter.enemy');
-    const playerHealth = document.querySelector('.player .health-fill');
-    const enemyHealth = document.querySelector('.enemy .health-fill');
-    const fightMessage = document.querySelector('.fight-message');
-    const roundIndicator = document.querySelector('.round-indicator');
-    
-    // Buttons
-    const startBtn = document.getElementById('startBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    
-    // Stats
-    const winsElement = document.getElementById('wins');
-    const lossesElement = document.getElementById('losses');
-    const roundElement = document.getElementById('round');
-    
-    // Tournament bracket
-    const bracketElement = document.getElementById('bracket');
-    
-    // Game state
-    let gameState = {
-        isRunning: false,
-        currentRound: 1,
-        playerHealth: 100,
-        enemyHealth: 100,
-        wins: 0,
-        losses: 0,
-        matches: [],
-        currentMatch: 0,
-        fighters: [
-            { name: "Player", health: 100, wins: 0, losses: 0 },
-            { name: "Blue Fighter", health: 100, wins: 0, losses: 0 },
-            { name: "Red Warrior", health: 100, wins: 0, losses: 0 },
-            { name: "Green Champion", health: 100, wins: 0, losses: 0 }
-        ]
-    };
-    
-    // Initialize the tournament bracket
-    function initializeBracket() {
-        bracketElement.innerHTML = '';
-        gameState.matches = [];
+// main.js
+import { GameRoom } from './gameRoom.js';
+import { Lobby } from './lobby.js';
+import { Leaderboard } from './leaderboards.js';
+import { DOMBuilder } from './domBuilder.js';
+import { createEnemy } from './enemy.js';
+
+class BlackjackApp {
+    constructor() {
+        this.lobby = new Lobby();
+        this.leaderboard = new Leaderboard();
+        this.gameRoom = null;
+        this.currentView = 'lobby'; // 'lobby', 'game', 'leaderboard'
+        this.tournamentStartTime = null;
         
-        // Create round-robin matches (each fighter fights every other fighter)
-        for (let i = 0; i < gameState.fighters.length; i++) {
-            for (let j = i + 1; j < gameState.fighters.length; j++) {
-                gameState.matches.push({
-                    fighter1: gameState.fighters[i].name,
-                    fighter2: gameState.fighters[j].name,
-                    score1: 0,
-                    score2: 0,
-                    winner: null
-                });
-            }
+        this.initializeApp();
+    }
+    
+    initializeApp() {
+        this.setupEventListeners();
+        this.showLobby();
+    }
+    
+    setupEventListeners() {
+        document.addEventListener('tournamentStart', (e) => this.startTournament(e.detail.enemyConfigs));
+        document.addEventListener('showLeaderboard', () => this.showLeaderboard());
+        document.addEventListener('showLobby', () => this.showLobby());
+    }
+    
+    showLobby() {
+        this.currentView = 'lobby';
+        this.lobby.initializeLobbyUI();
+    }
+    
+    showLeaderboard() {
+        this.currentView = 'leaderboard';
+        this.leaderboard.initializeLeaderboardUI();
+    }
+    
+    startTournament(enemyConfigs) {
+        this.currentView = 'game';
+        this.tournamentStartTime = Date.now();
+        this.gameRoom = new GameRoom();
+        
+        // Add human player
+        this.gameRoom.addPlayer("You");
+        
+        // Add AI players based on config
+        enemyConfigs.forEach(config => {
+            const enemy = createEnemy(config.type, config.name);
+            this.gameRoom.addEnemy(enemy);
+        });
+        
+        // Start tournament
+        this.gameRoom.startRoundRobin();
+        
+        // Initialize game UI
+        DOMBuilder.initializeGameUI();
+        this.attachGameEventListeners();
+        this.startCurrentGame();
+    }
+    
+    attachGameEventListeners() {
+        document.getElementById('hit-btn').addEventListener('click', () => this.playerHit());
+        document.getElementById('stand-btn').addEventListener('click', () => this.playerStand());
+        document.getElementById('next-btn').addEventListener('click', () => this.nextGame());
+        document.getElementById('reset-btn').addEventListener('click', () => this.resetTournament());
+        document.getElementById('lobby-btn').addEventListener('click', () => this.returnToLobby());
+    }
+    
+    startCurrentGame() {
+        const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+        console.log(`Starting game: ${currentGame.player1.name} vs ${currentGame.player2.name}`);
+        this.updateUI();
+    }
+    
+    playerHit() {
+        const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+        currentGame.hit();
+        this.updateUI();
+        
+        if (currentGame.gameOver) {
+            this.handleGameEnd();
         }
+    }
+    
+    playerStand() {
+        const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+        currentGame.stand();
+        this.updateUI();
         
-        // Display matches in the bracket
-        gameState.matches.forEach((match, index) => {
-            const matchElement = document.createElement('div');
-            matchElement.className = 'match';
-            matchElement.innerHTML = `
-                <div class="match-number">${index + 1}</div>
-                <div class="match-fighters">${match.fighter1} vs ${match.fighter2}</div>
-                <div class="match-score">${match.score1}-${match.score2}</div>
-            `;
-            bracketElement.appendChild(matchElement);
+        if (currentGame.gameOver) {
+            this.handleGameEnd();
+        }
+    }
+    
+    nextGame() {
+        if (this.gameRoom.nextGame()) {
+            this.startCurrentGame();
+        } else {
+            this.endTournament();
+        }
+    }
+    
+    resetTournament() {
+        if (confirm('Are you sure you want to reset the current tournament? All progress will be lost.')) {
+            this.gameRoom = new GameRoom();
+            this.setupGameFromCurrentConfig();
+        }
+    }
+    
+    returnToLobby() {
+        if (this.gameRoom && this.gameRoom.games.length > 0) {
+            if (confirm('Return to lobby? Current tournament progress will be lost.')) {
+                this.showLobby();
+            }
+        } else {
+            this.showLobby();
+        }
+    }
+    
+    setupGameFromCurrentConfig() {
+        // This would use the current enemy configs, but for now we'll restart with default
+        this.startCurrentGame();
+    }
+    
+    handleGameEnd() {
+        const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+        
+        // Record the winner
+        this.gameRoom.recordWin(currentGame.winner?.name);
+        
+        // Enable next game button
+        document.getElementById('next-btn').disabled = false;
+        
+        // Auto-advance after delay if it's AI vs AI
+        if (!currentGame.player1.isHuman && !currentGame.player2.isHuman) {
+            setTimeout(() => {
+                if (this.gameRoom.nextGame()) {
+                    this.startCurrentGame();
+                } else {
+                    this.endTournament();
+                }
+            }, 2000);
+        }
+    }
+    
+    endTournament() {
+        const leaderboard = this.gameRoom.getLeaderboard();
+        const tournamentDuration = Math.round((Date.now() - this.tournamentStartTime) / 1000 / 60); // minutes
+        
+        console.log("Tournament ended! Final leaderboard:", leaderboard);
+        
+        // Save to leaderboard
+        this.leaderboard.addEntry({
+            playerName: "You",
+            score: this.gameRoom.scores.get("You") || 0,
+            difficulty: this.lobby.currentDifficulty,
+            playerCount: this.gameRoom.players.length,
+            duration: `${tournamentDuration}m`,
+            wins: this.gameRoom.scores.get("You") || 0,
+            totalGames: this.gameRoom.games.length
+        });
+        
+        // Show tournament results
+        const statusElem = document.getElementById('status-message');
+        const winnerName = leaderboard[0][0];
+        statusElem.textContent = winnerName === "You" 
+            ? `🎉 You win the tournament! 🎉` 
+            : `Tournament Over! Winner: ${winnerName}`;
+        statusElem.className = 'status-message status-game-over';
+        
+        // Show celebration for human win
+        if (winnerName === "You") {
+            this.showCelebration();
+        }
+    }
+    
+    showCelebration() {
+        const statusElem = document.getElementById('status-message');
+        statusElem.style.animation = 'celebrate 2s ease-in-out';
+        
+        // Add some visual celebration
+        setTimeout(() => {
+            statusElem.style.animation = '';
+        }, 2000);
+    }
+    
+    updateUI() {
+        if (this.currentView !== 'game') return;
+        
+        const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+        this.updatePlayers(currentGame);
+        this.updateControls(currentGame);
+        this.updateGameInfo(currentGame);
+        this.updateLeaderboard();
+        this.updateTournamentProgress();
+        
+        // Auto-play AI turns
+        if (!currentGame.gameOver && !currentGame.currentPlayer.isHuman) {
+            setTimeout(() => this.playAITurn(), 1000);
+        }
+    }
+    
+    updatePlayers(game) {
+        // Update player 1
+        const player1Elem = document.getElementById('player1');
+        const player2Elem = document.getElementById('player2');
+        
+        // Update names
+        player1Elem.querySelector('.player-name').textContent = game.player1.name;
+        player2Elem.querySelector('.player-name').textContent = game.player2.name;
+        
+        // Update scores
+        document.getElementById('player1-score').textContent = game.player1.score;
+        document.getElementById('player2-score').textContent = game.player2.score;
+        
+        // Update active player
+        player1Elem.classList.toggle('active', game.currentPlayer === game.player1);
+        player2Elem.classList.toggle('active', game.currentPlayer === game.player2);
+        
+        // Update player types
+        player1Elem.classList.toggle('human', game.player1.isHuman);
+        player1Elem.classList.toggle('enemy', !game.player1.isHuman);
+        player2Elem.classList.toggle('human', game.player2.isHuman);
+        player2Elem.classList.toggle('enemy', !game.player2.isHuman);
+        
+        // Update bust status
+        player1Elem.classList.toggle('player-bust', game.player1.score > 21);
+        player2Elem.classList.toggle('player-bust', game.player2.score > 21);
+        
+        // Update winner status
+        player1Elem.classList.toggle('player-winner', game.winner === game.player1);
+        player2Elem.classList.toggle('player-winner', game.winner === game.player2);
+        
+        // Update cards display
+        this.renderCards('player1-cards', game.player1.hand);
+        this.renderCards('player2-cards', game.player2.hand);
+    }
+    
+    renderCards(containerId, hand) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        hand.forEach(card => {
+            const cardElem = DOMBuilder.createCardElement(card, true);
+            container.appendChild(cardElem);
         });
     }
     
-    // Start the tournament
-    startBtn.addEventListener('click', function() {
-        if (!gameState.isRunning) {
-            gameState.isRunning = true;
-            startBtn.disabled = true;
-            nextBtn.disabled = false;
-            gameState.currentMatch = 0;
-            playNextMatch();
-        }
-    });
-    
-    // Move to the next fight
-    nextBtn.addEventListener('click', function() {
-        if (gameState.isRunning) {
-            playNextMatch();
-        }
-    });
-    
-    // Reset the game
-    resetBtn.addEventListener('click', function() {
-        gameState.isRunning = false;
-        gameState.currentRound = 1;
-        gameState.playerHealth = 100;
-        gameState.enemyHealth = 100;
-        gameState.wins = 0;
-        gameState.losses = 0;
-        gameState.currentMatch = 0;
+    updateControls(game) {
+        const hitBtn = document.getElementById('hit-btn');
+        const standBtn = document.getElementById('stand-btn');
+        const nextBtn = document.getElementById('next-btn');
         
-        playerHealth.style.width = '100%';
-        enemyHealth.style.width = '100%';
+        const isHumanTurn = game.currentPlayer.isHuman;
+        const gameOver = game.gameOver;
         
-        startBtn.disabled = false;
-        nextBtn.disabled = true;
+        hitBtn.disabled = !isHumanTurn || gameOver;
+        standBtn.disabled = !isHumanTurn || gameOver;
+        nextBtn.disabled = !gameOver;
         
-        updateStats();
-        initializeBracket();
-        
-        // Reset fighter positions
-        playerFighter.style.left = '20%';
-        enemyFighter.style.left = 'calc(80% - 60px)';
-        
-        // Reset round indicator
-        roundIndicator.textContent = `Round ${gameState.currentRound}`;
-    });
-    
-    // Play the next match in the tournament
-    function playNextMatch() {
-        if (gameState.currentMatch >= gameState.matches.length) {
-            // Tournament is over
-            gameState.isRunning = false;
-            nextBtn.disabled = true;
-            fightMessage.textContent = "TOURNAMENT OVER!";
-            fightMessage.classList.add('show');
-            setTimeout(() => {
-                fightMessage.classList.remove('show');
-            }, 3000);
-            return;
-        }
-        
-        const match = gameState.matches[gameState.currentMatch];
-        const fighter1 = gameState.fighters.find(f => f.name === match.fighter1);
-        const fighter2 = gameState.fighters.find(f => f.name === match.fighter2);
-        
-        // Update fighter names in the arena
-        document.querySelector('.player .fighter-name').textContent = fighter1.name;
-        document.querySelector('.enemy .fighter-name').textContent = fighter2.name;
-        
-        // Update round indicator
-        roundIndicator.textContent = `Match ${gameState.currentMatch + 1}`;
-        
-        // Reset health for the new match
-        gameState.playerHealth = 100;
-        gameState.enemyHealth = 100;
-        playerHealth.style.width = '100%';
-        enemyHealth.style.width = '100%';
-        
-        // Show fight message
-        fightMessage.textContent = "FIGHT!";
-        fightMessage.classList.add('show');
-        
-        // Start the fight simulation after a delay
-        setTimeout(() => {
-            fightMessage.classList.remove('show');
-            simulateFight(fighter1, fighter2, match);
-        }, 1500);
+        // Show/hide lobby button based on game state
+        const lobbyBtn = document.getElementById('lobby-btn');
+        lobbyBtn.style.display = gameOver ? 'inline-block' : 'none';
     }
     
-    // Simulate a fight between two fighters
-    function simulateFight(fighter1, fighter2, match) {
-        let fightInterval = setInterval(() => {
-            // Randomly determine who attacks
-            const attacker = Math.random() > 0.5 ? fighter1 : fighter2;
-            const defender = attacker === fighter1 ? fighter2 : fighter1;
-            
-            // Calculate damage (between 5 and 15)
-            const damage = Math.floor(Math.random() * 11) + 5;
-            
-            // Apply damage
-            if (defender === fighter1) {
-                gameState.playerHealth = Math.max(0, gameState.playerHealth - damage);
-                playerHealth.style.width = `${gameState.playerHealth}%`;
-                
-                // Visual feedback for hit
-                playerFighter.style.transform = 'translateX(-5px)';
-                setTimeout(() => {
-                    playerFighter.style.transform = 'translateX(0)';
-                }, 100);
+    updateGameInfo(game) {
+        document.getElementById('current-player').textContent = game.currentPlayer.name;
+        document.getElementById('game-status').textContent = game.gameOver ? 'Game Over' : 'Active';
+        document.getElementById('deck-count').textContent = game.deck.cards.length;
+        
+        // Update status message
+        const statusElem = document.getElementById('status-message');
+        statusElem.className = 'status-message';
+        
+        if (game.gameOver) {
+            if (game.winner) {
+                statusElem.textContent = `${game.winner.name} wins with ${game.winner.score}!`;
             } else {
-                gameState.enemyHealth = Math.max(0, gameState.enemyHealth - damage);
-                enemyHealth.style.width = `${gameState.enemyHealth}%`;
-                
-                // Visual feedback for hit
-                enemyFighter.style.transform = 'translateX(5px)';
-                setTimeout(() => {
-                    enemyFighter.style.transform = 'translateX(0)';
-                }, 100);
+                statusElem.textContent = "It's a tie!";
             }
-            
-            // Move fighters based on health difference
-            const healthDiff = gameState.playerHealth - gameState.enemyHealth;
-            const playerPos = 20 + (healthDiff * 0.1);
-            const enemyPos = 80 - (healthDiff * 0.1);
-            
-            playerFighter.style.left = `${Math.max(5, Math.min(40, playerPos))}%`;
-            enemyFighter.style.left = `calc(${Math.max(40, Math.min(75, enemyPos))}% - 60px)`;
-            
-            // Check if fight is over
-            if (gameState.playerHealth <= 0 || gameState.enemyHealth <= 0) {
-                clearInterval(fightInterval);
-                
-                // Determine winner
-                let winner;
-                if (gameState.playerHealth <= 0 && gameState.enemyHealth <= 0) {
-                    winner = Math.random() > 0.5 ? fighter1 : fighter2;
-                } else if (gameState.playerHealth <= 0) {
-                    winner = fighter2;
-                } else {
-                    winner = fighter1;
-                }
-                
-                // Update match results
-                if (winner === fighter1) {
-                    match.score1 = 1;
-                    fighter1.wins++;
-                    fighter2.losses++;
-                } else {
-                    match.score2 = 1;
-                    fighter2.wins++;
-                    fighter1.losses++;
-                }
-                match.winner = winner.name;
-                
-                // Update bracket display
-                const matchElement = bracketElement.children[gameState.currentMatch];
-                matchElement.classList.add('winner');
-                matchElement.querySelector('.match-score').textContent = `${match.score1}-${match.score2}`;
-                
-                // Update stats if player was involved
-                if (fighter1.name === "Player" || fighter2.name === "Player") {
-                    if (winner.name === "Player") {
-                        gameState.wins++;
-                    } else {
-                        gameState.losses++;
-                    }
-                    updateStats();
-                }
-                
-                // Move to next match after a delay
-                setTimeout(() => {
-                    gameState.currentMatch++;
-                    if (gameState.currentMatch < gameState.matches.length) {
-                        playNextMatch();
-                    } else {
-                        gameState.isRunning = false;
-                        nextBtn.disabled = true;
-                        fightMessage.textContent = "TOURNAMENT OVER!";
-                        fightMessage.classList.add('show');
-                        setTimeout(() => {
-                            fightMessage.classList.remove('show');
-                        }, 3000);
-                    }
-                }, 2000);
-            }
-        }, 300);
+            statusElem.classList.add('status-game-over');
+        } else if (game.currentPlayer.isHuman) {
+            statusElem.textContent = 'Your turn! Choose to Hit or Stand.';
+            statusElem.classList.add('status-player-turn');
+        } else {
+            statusElem.textContent = `${game.currentPlayer.name} is thinking...`;
+            statusElem.classList.add('status-enemy-turn');
+        }
     }
     
-    // Update statistics display
-    function updateStats() {
-        winsElement.textContent = gameState.wins;
-        lossesElement.textContent = gameState.losses;
-        roundElement.textContent = gameState.currentRound;
+    updateLeaderboard() {
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const leaderboard = this.gameRoom.getLeaderboard();
+        
+        leaderboardList.innerHTML = '';
+        leaderboard.forEach(([name, score], index) => {
+            const item = document.createElement('li');
+            item.className = 'leaderboard-item';
+            
+            // Add special class for human player
+            if (name === "You") {
+                item.classList.add('current-player');
+            }
+            
+            item.innerHTML = `
+                <span class="leaderboard-rank">#${index + 1}</span>
+                <span class="leaderboard-name">${name}</span>
+                <span class="leaderboard-score">${score}</span>
+            `;
+            leaderboardList.appendChild(item);
+        });
     }
     
-    // Initialize the game
-    initializeBracket();
-    updateStats();
+    updateTournamentProgress() {
+        const totalGames = this.gameRoom.games.length;
+        const currentGame = this.gameRoom.currentGameIndex + 1;
+        const progress = (currentGame / totalGames) * 100;
+        
+        document.getElementById('game-count').textContent = `Game ${currentGame} of ${totalGames}`;
+        document.getElementById('games-played').textContent = `${currentGame - 1}/${totalGames}`;
+        document.getElementById('progress-fill').style.width = `${progress}%`;
+    }
+    
+    playAITurn() {
+        const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+        
+        if (!currentGame.gameOver && !currentGame.currentPlayer.isHuman) {
+            if (currentGame.currentPlayer.shouldHit()) {
+                this.playerHit();
+            } else {
+                this.playerStand();
+            }
+        }
+    }
+}
+
+// Start the application when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.app = new BlackjackApp();
 });

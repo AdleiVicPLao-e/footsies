@@ -1,0 +1,91 @@
+/* styles/components/leaderboard-animations.css */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRow {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.leaderboard-table tbody tr {
+    animation: slideInRow 0.6s ease-out backwards;
+}
+
+.leaderboard-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.leaderboard-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.leaderboard-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.leaderboard-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.leaderboard-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+.leaderboard-table tbody tr:nth-child(6) { animation-delay: 0.6s; }
+.leaderboard-table tbody tr:nth-child(7) { animation-delay: 0.7s; }
+.leaderboard-table tbody tr:nth-child(8) { animation-delay: 0.8s; }
+.leaderboard-table tbody tr:nth-child(9) { animation-delay: 0.9s; }
+.leaderboard-table tbody tr:nth-child(10) { animation-delay: 1.0s; }
+
+/* Medal animations */
+.rank-cell:nth-child(1) .medal {
+    animation: bounce 2s infinite;
+}
+
+.rank-cell:nth-child(2) .medal {
+    animation: pulse 3s infinite;
+}
+
+.rank-cell:nth-child(3) .medal {
+    animation: glow 4s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-5px);
+    }
+    60% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 15px rgba(205, 127, 50, 0.8);
+    }
+}
+
+/* Highlight current player */
+.leaderboard-table tbody tr.current-player {
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.1), transparent);
+    border-left: 4px solid var(--color-accent);
+}
+
+.leaderboard-table tbody tr.current-player .player-cell {
+    color: var(--color-accent);
+    font-weight: bold;
+}

@@ -1,0 +1,54 @@
+/* styles/components/leaderboard-filters.css */
+.leaderboard-filters {
+    display: flex;
+    gap: var(--space-xl);
+    align-items: end;
+    flex-wrap: wrap;
+    padding: var(--space-xl);
+    background: var(--leaderboard-bg-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--leaderboard-shadow);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    font-weight: bold;
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-select {
+    padding: var(--space-md);
+    border: 2px solid var(--leaderboard-border-color);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    font-size: var(--font-size-base);
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.filter-select:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+#clear-leaderboard {
+    align-self: center;
+    margin-left: auto;
+}

@@ -1,0 +1,46 @@
+/* styles/components/distribution-display.css */
+.distribution-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+}
+
+.distribution-item {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.distribution-item.difficulty-easy {
+    background: color-mix(in srgb, var(--difficulty-easy) 20%, transparent);
+    border: 1px solid var(--difficulty-easy);
+    color: var(--difficulty-easy);
+}
+
+.distribution-item.difficulty-medium {
+    background: color-mix(in srgb, var(--difficulty-medium) 20%, transparent);
+    border: 1px solid var(--difficulty-medium);
+    color: var(--difficulty-medium);
+}
+
+.distribution-item.difficulty-hard {
+    background: color-mix(in srgb, var(--difficulty-hard) 20%, transparent);
+    border: 1px solid var(--difficulty-hard);
+    color: var(--difficulty-hard);
+}
+
+.distribution-item.difficulty-random {
+    background: color-mix(in srgb, var(--difficulty-random) 20%, transparent);
+    border: 1px solid var(--difficulty-random);
+    color: var(--difficulty-random);
+}
+
+.distribution-item.difficulty-adaptive {
+    background: color-mix(in srgb, var(--difficulty-adaptive) 20%, transparent);
+    border: 1px solid var(--difficulty-adaptive);
+    color: var(--difficulty-adaptive);
+}

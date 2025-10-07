@@ -1,0 +1,47 @@
+/* styles/components/game-area.css */
+.game-area {
+    background: var(--bg-card-dark);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    border: 2px solid var(--color-accent);
+    box-shadow: var(--shadow-xl);
+}
+
+.status-message {
+    text-align: center;
+    padding: var(--space-lg);
+    margin: var(--space-xl) 0;
+    border-radius: var(--radius-md);
+    font-weight: bold;
+    font-size: var(--font-size-lg);
+}
+
+.status-waiting {
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid var(--color-warning);
+    color: var(--color-warning);
+}
+
+.status-player-turn {
+    background: rgba(76, 175, 80, 0.2);
+    border: 1px solid var(--color-success);
+    color: var(--color-success);
+}
+
+.status-enemy-turn {
+    background: rgba(244, 67, 54, 0.2);
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+}
+
+.status-game-over {
+    background: rgba(156, 39, 176, 0.2);
+    border: 1px solid #9c27b0;
+    color: #9c27b0;
+    animation: celebrate 1s ease-in-out;
+}
+
+@keyframes celebrate {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}

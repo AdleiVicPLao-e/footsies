@@ -1,0 +1,49 @@
+/* styles/components/lobby-buttons.css */
+.btn-large {
+    padding: var(--space-lg) var(--space-2xl);
+    font-size: var(--font-size-xl);
+    min-width: 200px;
+}
+
+.btn-primary {
+    background: var(--btn-primary-bg);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    background: var(--btn-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: var(--btn-secondary-bg);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    padding: var(--space-md) var(--space-xl);
+}
+
+.btn-secondary:hover {
+    background: var(--btn-secondary-hover);
+    transform: translateY(-1px);
+}
+
+.lobby-actions .btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+}

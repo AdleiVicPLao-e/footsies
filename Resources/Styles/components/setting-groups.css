@@ -1,0 +1,68 @@
+/* styles/components/setting-groups.css */
+.setting-group {
+    margin-bottom: var(--space-2xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.setting-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.setting-label {
+    display: block;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: var(--space-md);
+    font-size: var(--font-size-lg);
+}
+
+.setting-description {
+    display: block;
+    color: var(--color-gray-dark);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-sm);
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    max-width: 300px;
+}
+
+.number-input {
+    width: 80px;
+    padding: var(--space-md);
+    border: 2px solid var(--lobby-border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+    text-align: center;
+    background: var(--color-white);
+}
+
+.btn-stepper {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--lobby-border-color);
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-stepper:hover {
+    background: var(--lobby-border-color);
+    color: var(--color-white);
+}
+
+.btn-stepper:active {
+    transform: scale(0.95);
+}
