@@ -117,29 +117,31 @@ export class DOMBuilder {
         return button;
     }
 
-    static createCardElement(card, isFaceUp = true) {
-        const cardElem = document.createElement('div');
-        
-        if (isFaceUp) {
-            const isRed = card.suit === 'Hearts' || card.suit === 'Diamonds';
-            cardElem.className = `card ${isRed ? 'red' : 'black'} card-dealing`;
-            cardElem.innerHTML = `
-                <div class="card-top">
-                    <div>${card.rank}</div>
-                    <div>${this.getSuitSymbol(card.suit)}</div>
-                </div>
-                <div class="card-center">${this.getSuitSymbol(card.suit)}</div>
-                <div class="card-bottom">
-                    <div>${card.rank}</div>
-                    <div>${this.getSuitSymbol(card.suit)}</div>
-                </div>
-            `;
-        } else {
-            cardElem.className = 'card card-back card-dealing';
-        }
-        
-        return cardElem;
+    // In DOMBuilder.js - update the createCardElement method
+static createCardElement(card, isFaceUp = true) {
+    const cardElem = document.createElement('div');
+    
+    if (isFaceUp && !card.isHidden) {
+        const isRed = card.suit === 'Hearts' || card.suit === 'Diamonds';
+        cardElem.className = `card ${isRed ? 'red' : 'black'} card-dealing`;
+        cardElem.innerHTML = `
+            <div class="card-top">
+                <div>${card.rank}</div>
+                <div>${this.getSuitSymbol(card.suit)}</div>
+            </div>
+            <div class="card-center">${this.getSuitSymbol(card.suit)}</div>
+            <div class="card-bottom">
+                <div>${card.rank}</div>
+                <div>${this.getSuitSymbol(card.suit)}</div>
+            </div>
+        `;
+    } else {
+        cardElem.className = 'card card-back card-dealing';
+        cardElem.innerHTML = `<div class="card-hidden">?</div>`;
     }
+    
+    return cardElem;
+}
 
     static getSuitSymbol(suit) {
         const symbols = {

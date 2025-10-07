@@ -38,28 +38,28 @@ class BlackjackApp {
     }
     
     startTournament(enemyConfigs) {
-        this.currentView = 'game';
-        this.tournamentStartTime = Date.now();
-        this.gameRoom = new GameRoom();
-        
-        // Add human player
-        this.gameRoom.addPlayer("You");
-        
-        // Add AI players based on config
-        enemyConfigs.forEach(config => {
-            const enemy = createEnemy(config.type, config.name);
-            this.gameRoom.addEnemy(enemy);
-        });
-        
-        // Start tournament
-        this.gameRoom.startRoundRobin();
-        
-        // Initialize game UI
-        DOMBuilder.initializeGameUI();
-        this.attachGameEventListeners();
-        this.startCurrentGame();
-    }
+    this.currentView = 'game';
+    this.tournamentStartTime = Date.now();
+    this.gameRoom = new GameRoom();
     
+    // Add human player
+    this.gameRoom.addPlayer("You");
+    
+    // Add AI players based on config
+    enemyConfigs.forEach(config => {
+        const enemy = createEnemy(config.type, config.name);
+        this.gameRoom.addEnemy(enemy);
+    });
+    
+    // Start tournament
+    this.gameRoom.startRoundRobin();
+    
+    // Initialize game UI
+    DOMBuilder.initializeGameUI();
+    this.attachGameEventListeners();
+    this.startCurrentGame();
+}
+
     attachGameEventListeners() {
         document.getElementById('hit-btn').addEventListener('click', () => this.playerHit());
         document.getElementById('stand-btn').addEventListener('click', () => this.playerStand());
@@ -69,10 +69,16 @@ class BlackjackApp {
     }
     
     startCurrentGame() {
-        const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
-        console.log(`Starting game: ${currentGame.player1.name} vs ${currentGame.player2.name}`);
+    const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+    
+    // Set up the UI update callback
+    currentGame.setOnStateChange(() => {
         this.updateUI();
-    }
+    });
+    
+    console.log(`Starting game: ${currentGame.player1.name} vs ${currentGame.player2.name}`);
+    this.updateUI(); // Force initial UI update
+}
     
     playerHit() {
         const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
@@ -187,8 +193,9 @@ class BlackjackApp {
     }
     
     updateUI() {
-        if (this.currentView !== 'game') return;
-        
+    if (this.currentView !== 'game') return;
+    
+    try {
         const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
         this.updatePlayers(currentGame);
         this.updateControls(currentGame);
@@ -196,57 +203,90 @@ class BlackjackApp {
         this.updateLeaderboard();
         this.updateTournamentProgress();
         
-        // Auto-play AI turns
-        if (!currentGame.gameOver && !currentGame.currentPlayer.isHuman) {
+        // Auto-play AI turns with proper checks
+        if (!currentGame.gameOver && 
+            !currentGame.currentPlayer.isHuman && 
+            !currentGame.processingAITurn &&
+            !currentGame.currentPlayer.isStanding) {
             setTimeout(() => this.playAITurn(), 1000);
         }
+    } catch (error) {
+        console.error('Error updating UI:', error);
     }
+}
     
     updatePlayers(game) {
-        // Update player 1
-        const player1Elem = document.getElementById('player1');
-        const player2Elem = document.getElementById('player2');
-        
-        // Update names
-        player1Elem.querySelector('.player-name').textContent = game.player1.name;
-        player2Elem.querySelector('.player-name').textContent = game.player2.name;
-        
-        // Update scores
-        document.getElementById('player1-score').textContent = game.player1.score;
-        document.getElementById('player2-score').textContent = game.player2.score;
-        
-        // Update active player
-        player1Elem.classList.toggle('active', game.currentPlayer === game.player1);
-        player2Elem.classList.toggle('active', game.currentPlayer === game.player2);
-        
-        // Update player types
-        player1Elem.classList.toggle('human', game.player1.isHuman);
-        player1Elem.classList.toggle('enemy', !game.player1.isHuman);
-        player2Elem.classList.toggle('human', game.player2.isHuman);
-        player2Elem.classList.toggle('enemy', !game.player2.isHuman);
-        
-        // Update bust status
-        player1Elem.classList.toggle('player-bust', game.player1.score > 21);
-        player2Elem.classList.toggle('player-bust', game.player2.score > 21);
-        
-        // Update winner status
-        player1Elem.classList.toggle('player-winner', game.winner === game.player1);
-        player2Elem.classList.toggle('player-winner', game.winner === game.player2);
-        
-        // Update cards display
-        this.renderCards('player1-cards', game.player1.hand);
-        this.renderCards('player2-cards', game.player2.hand);
+    // Update player 1
+    const player1Elem = document.getElementById('player1');
+    const player2Elem = document.getElementById('player2');
+    
+    // Update names
+    player1Elem.querySelector('.player-name').textContent = game.player1.name;
+    player2Elem.querySelector('.player-name').textContent = game.player2.name;
+    
+    // Update scores
+    document.getElementById('player1-score').textContent = game.player1.score;
+    
+    // Update enemy score display with special formatting
+    const enemyScoreElem = document.getElementById('player2-score');
+    if (!game.player2.isHuman) {
+        enemyScoreElem.textContent = game.getEnemyScoreForDisplay();
+        // Add a class for styling when score is partial
+        if (!game.shouldShowEnemyCards()) {
+            enemyScoreElem.classList.add('partial-score');
+        } else {
+            enemyScoreElem.classList.remove('partial-score');
+        }
+    } else {
+        enemyScoreElem.textContent = game.player2.score;
+        enemyScoreElem.classList.remove('partial-score');
     }
     
-    renderCards(containerId, hand) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = '';
-        
+    // Update active player
+    player1Elem.classList.toggle('active', game.currentPlayer === game.player1);
+    player2Elem.classList.toggle('active', game.currentPlayer === game.player2);
+    
+    // Update player types
+    player1Elem.classList.toggle('human', game.player1.isHuman);
+    player1Elem.classList.toggle('enemy', !game.player1.isHuman);
+    player2Elem.classList.toggle('human', game.player2.isHuman);
+    player2Elem.classList.toggle('enemy', !game.player2.isHuman);
+    
+    // Update bust status
+    player1Elem.classList.toggle('player-bust', game.player1.score > 21);
+    player2Elem.classList.toggle('player-bust', game.player2.score > 21);
+    
+    // Update winner status
+    player1Elem.classList.toggle('player-winner', game.winner === game.player1);
+    player2Elem.classList.toggle('player-winner', game.winner === game.player2);
+    
+    // Update cards display with enemy handling
+    this.renderCards('player1-cards', game.player1.hand, false);
+    this.renderCards('player2-cards', game.player2.hand, true); // Pass true for enemy
+}
+    
+    renderCards(containerId, hand, isEnemy = false) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+    
+    if (isEnemy && containerId === 'player2-cards') {
+        // Use the special method for enemy hand display
+        const displayHand = currentGame.getEnemyHandForDisplay();
+        displayHand.forEach((card, index) => {
+            const isFaceUp = !card.isHidden;
+            const cardElem = DOMBuilder.createCardElement(card, isFaceUp);
+            container.appendChild(cardElem);
+        });
+    } else {
+        // Regular display for human player
         hand.forEach(card => {
             const cardElem = DOMBuilder.createCardElement(card, true);
             container.appendChild(cardElem);
         });
     }
+}
     
     updateControls(game) {
         const hitBtn = document.getElementById('hit-btn');
@@ -323,17 +363,35 @@ class BlackjackApp {
         document.getElementById('progress-fill').style.width = `${progress}%`;
     }
     
-    playAITurn() {
-        const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
-        
-        if (!currentGame.gameOver && !currentGame.currentPlayer.isHuman) {
-            if (currentGame.currentPlayer.shouldHit()) {
-                this.playerHit();
-            } else {
-                this.playerStand();
-            }
-        }
+    // In main.js - update the playAITurn method
+playAITurn() {
+    const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+    
+    if (!currentGame.gameOver && !currentGame.currentPlayer.isHuman && !currentGame.processingAITurn) {
+        console.log(`AI ${currentGame.currentPlayer.name} taking turn`);
+        currentGame.handleAITurn();
     }
+}
+
+// Also update the updateUI method to be more careful about AI turns
+updateUI() {
+    if (this.currentView !== 'game') return;
+    
+    const currentGame = this.gameRoom.games[this.gameRoom.currentGameIndex];
+    this.updatePlayers(currentGame);
+    this.updateControls(currentGame);
+    this.updateGameInfo(currentGame);
+    this.updateLeaderboard();
+    this.updateTournamentProgress();
+    
+    // Auto-play AI turns with proper checks
+    if (!currentGame.gameOver && 
+        !currentGame.currentPlayer.isHuman && 
+        !currentGame.processingAITurn &&
+        !currentGame.currentPlayer.isStanding) {
+        setTimeout(() => this.playAITurn(), 1000);
+    }
+}
 }
 
 // Start the application when DOM is loaded

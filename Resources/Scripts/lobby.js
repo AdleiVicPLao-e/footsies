@@ -1,4 +1,6 @@
 // src/lobby.js
+import { createEnemy } from './enemy.js';
+
 export class Lobby {
     constructor() {
         this.players = [];
@@ -241,5 +243,22 @@ export class Lobby {
             'adaptive': 'AdaptiveEnemy'
         };
         return types[difficulty];
+    }
+
+    // New method to create actual enemy instances using the factory function
+    createEnemyInstances() {
+        const distribution = this.calculateAIDistribution();
+        const enemies = [];
+
+        Object.entries(distribution).forEach(([difficulty, count]) => {
+            for (let i = 1; i <= count; i++) {
+                const enemyType = this.getEnemyType(difficulty);
+                const enemyName = `${this.capitalizeFirst(difficulty)} AI ${i}`;
+                const enemy = createEnemy(enemyType, enemyName);
+                enemies.push(enemy);
+            }
+        });
+
+        return enemies;
     }
 }
