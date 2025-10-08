@@ -14,9 +14,9 @@ export class Deck {
             { rank: '4', value: 4 }, { rank: '5', value: 5 },
             { rank: '6', value: 6 }, { rank: '7', value: 7 },
             { rank: '8', value: 8 }, { rank: '9', value: 9 },
-            { rank: '10', value: 10 }, { rank: 'jack', value: 10 },
-            { rank: 'queen', value: 10 }, { rank: 'king', value: 10 },
-            { rank: 'ace', value: 11 }
+            { rank: '10', value: 10 }, { rank: 'J', value: 10 },
+            { rank: 'Q', value: 10 }, { rank: 'K', value: 10 },
+            { rank: 'A', value: 11 }
         ];
         
         for (let suit of suits) {
