@@ -56,11 +56,6 @@
     color: var(--color-white);
 }
 
-.btn-reset {
-    background: linear-gradient(45deg, var(--color-danger), #d32f2f);
-    color: var(--color-white);
-}
-
 .btn:disabled {
     background: var(--color-gray-dark);
     cursor: not-allowed;

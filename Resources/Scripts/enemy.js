@@ -3,9 +3,10 @@ import { Player } from './player.js';
 
 // Base Enemy class that all specific enemies extend
 export class Enemy extends Player {
-    constructor(name, difficulty) {
+    constructor(name, difficulty, cardDesign = 'intermediate') {
         super(name, false);
         this.difficulty = difficulty;
+        this.cardDesign = cardDesign;
     }
 
     // Default implementations that can be overridden
@@ -27,8 +28,8 @@ export class Enemy extends Player {
 }
 
 export class BeginnerEnemy extends Enemy {
-    constructor(name) {
-        super(name, 'easy');
+    constructor(name, cardDesign = 'easy') {
+        super(name, 'easy', cardDesign);
     }
 
     shouldHit() {
@@ -38,8 +39,8 @@ export class BeginnerEnemy extends Enemy {
 }
 
 export class IntermediateEnemy extends Enemy {
-    constructor(name) {
-        super(name, 'medium');
+   constructor(name, cardDesign = 'intermediate') {
+        super(name, 'medium', cardDesign);
     }
 
     shouldHit() {
@@ -62,8 +63,8 @@ export class IntermediateEnemy extends Enemy {
 }
 
 export class ExpertEnemy extends Enemy {
-    constructor(name) {
-        super(name, 'hard');
+    constructor(name, cardDesign = 'expert') {
+        super(name, 'hard', cardDesign);
         this.strategyTable = this.initializeStrategyTable();
     }
 
@@ -114,8 +115,8 @@ export class ExpertEnemy extends Enemy {
 }
 
 export class RandomEnemy extends Enemy {
-    constructor(name) {
-        super(name, 'random');
+    constructor(name, cardDesign = 'random') {
+        super(name, 'random', cardDesign);
     }
 
     shouldHit() {
@@ -138,8 +139,8 @@ export class RandomEnemy extends Enemy {
 }
 
 export class AdaptiveEnemy extends Enemy {
-    constructor(name) {
-        super(name, 'adaptive');
+    constructor(name, cardDesign = 'adaptive') {
+        super(name, 'adaptive', cardDesign);
         this.aggressionLevel = 0.5;
         this.previousResults = [];
     }
@@ -194,7 +195,7 @@ export class AdaptiveEnemy extends Enemy {
 }
 
 // Factory function to create enemies by type
-export function createEnemy(type, name) {
+export function createEnemy(type, name, cardDesign = null) {
     const enemyClasses = {
         'BeginnerEnemy': BeginnerEnemy,
         'IntermediateEnemy': IntermediateEnemy,
@@ -203,6 +204,19 @@ export function createEnemy(type, name) {
         'AdaptiveEnemy': AdaptiveEnemy
     };
     
-    const EnemyClass = enemyClasses[type] || Enemy; // Fallback to base Enemy
-    return new EnemyClass(name);
+    const EnemyClass = enemyClasses[type] || Enemy;
+    
+    // If no specific design provided, use the default for that enemy type
+    if (!cardDesign) {
+        const defaultDesigns = {
+            'BeginnerEnemy': 'easy',
+            'IntermediateEnemy': 'intermediate', 
+            'ExpertEnemy': 'expert',
+            'RandomEnemy': 'random',
+            'AdaptiveEnemy': 'adaptive'
+        };
+        cardDesign = defaultDesigns[type] || 'intermediate';
+    }
+    
+    return new EnemyClass(name, cardDesign);
 }

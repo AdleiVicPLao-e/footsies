@@ -1,96 +1,146 @@
 // game.js
 import { Deck } from './deck.js';
 import { Player } from './player.js';
-import { Enemy } from './enemy.js';
 
 export class Game {
-    constructor(player1Name, player2Name, isPlayer2Human = false) {
+    constructor(player1, player2) {
         this.deck = new Deck();
-        this.player1 = new Player(player1Name);
-        this.player2 = isPlayer2Human ? new Player(player2Name) : new Enemy(player2Name);
+        
+        // Handle case where we get objects instead of Player instances
+        this.player1 = this.ensurePlayerObject(player1);
+        this.player2 = this.ensurePlayerObject(player2);
+        
         this.currentPlayer = this.player1;
         this.gameOver = false;
         this.winner = null;
         this.revealEnemyCards = false;
         this.processingAITurn = false;
-        this.onStateChange = null; // Callback for UI updates
+        this.onStateChange = null;
+        
+        // Track if this is an AI vs AI game
+        this.isAIVsAI = !this.player1.isHuman && !this.player2.isHuman;
+        
+        console.log(`Game created: ${this.player1.name} (${this.player1.isHuman ? 'Human' : 'AI'}) vs ${this.player2.name} (${this.player2.isHuman ? 'Human' : 'AI'})`);
+        console.log(`Is AI vs AI: ${this.isAIVsAI}`);
     }
     
-    // Set callback for UI updates
+    // Helper method to ensure we have proper Player objects
+    ensurePlayerObject(player) {
+        // If it's already a Player instance (or Enemy which extends Player), return it
+        if (player && typeof player.addCard === 'function') {
+            return player;
+        }
+        // If it's a plain object with name and isHuman, create a Player
+        else if (player && player.name && typeof player.isHuman === 'boolean') {
+            return new Player(player.name, player.isHuman);
+        }
+        // Fallback - create a human player
+        else {
+            console.warn('Invalid player object, creating default human player:', player);
+            return new Player(player?.name || 'Unknown', true);
+        }
+    }
+    
     setOnStateChange(callback) {
         this.onStateChange = callback;
     }
     
-    // Helper method to trigger UI updates
     triggerUIUpdate() {
         if (this.onStateChange) {
-            this.onStateChange();
+            setTimeout(() => this.onStateChange(), 0);
         }
     }
     
     startGame() {
+        this.player1.clearHand();
+        this.player2.clearHand();
+        this.currentPlayer = this.player1;
+        this.gameOver = false;
+        this.winner = null;
+        this.revealEnemyCards = false;
+        this.processingAITurn = false;
+        
         // Deal initial cards
         this.player1.addCard(this.deck.drawCard());
         this.player2.addCard(this.deck.drawCard());
         this.player1.addCard(this.deck.drawCard());
         this.player2.addCard(this.deck.drawCard());
         
-        this.revealEnemyCards = false;
-        this.processingAITurn = false;
-        this.triggerUIUpdate(); // Update UI after game starts
-    }
-    
-    nextTurn() {
-        if (this.gameOver || this.processingAITurn) return;
+        this.triggerUIUpdate();
         
-        // If current player is AI, make automatic move
-        if (!this.currentPlayer.isHuman) {
+        console.log(`Game started. Scores: ${this.player1.name}: ${this.player1.score}, ${this.player2.name}: ${this.player2.score}`);
+        
+        // If it's AI vs AI, start the AI turns automatically
+        if (this.isAIVsAI) {
+            console.log("Starting AI vs AI game automatically");
+            this.startAIVsAIGame();
+        } else if (!this.currentPlayer.isHuman) {
+            console.log("Starting AI turn automatically");
             this.handleAITurn();
         }
+    }
+    
+    startAIVsAIGame() {
+        if (!this.isAIVsAI || this.gameOver) return;
+        this.handleAITurn();
     }
     
     handleAITurn() {
         if (this.gameOver || this.processingAITurn) return;
         
         this.processingAITurn = true;
-        this.triggerUIUpdate(); // Update UI to show AI is thinking
+        this.triggerUIUpdate();
         
-        // Use setTimeout to avoid blocking and allow UI updates
         setTimeout(() => {
-            if (this.currentPlayer.shouldHit() && !this.currentPlayer.isStanding) {
-                this.hit();
+            if (this.gameOver) {
+                this.processingAITurn = false;
+                return;
+            }
+            
+            // For AI players, use their decision logic
+            if (this.currentPlayer.shouldHit && !this.currentPlayer.isStanding && !this.currentPlayer.isBust()) {
+                const shouldHit = this.currentPlayer.shouldHit();
+                console.log(`AI ${this.currentPlayer.name} decision: ${shouldHit ? 'HIT' : 'STAND'}, Score: ${this.currentPlayer.score}`);
+                if (shouldHit) {
+                    this.hit();
+                } else {
+                    this.stand();
+                }
             } else {
                 this.stand();
             }
-            this.processingAITurn = false;
-        }, 1000); // 1 second delay for AI "thinking"
+        }, 1000);
     }
     
     hit() {
-        if (this.gameOver || this.currentPlayer.isStanding) {
+        if (this.gameOver || this.currentPlayer.isStanding || this.currentPlayer.isBust()) {
             this.processingAITurn = false;
             return;
         }
         
-        console.log(`${this.currentPlayer.name} hits`);
+        console.log(`${this.currentPlayer.name} hits, current score: ${this.currentPlayer.score}`);
         this.currentPlayer.addCard(this.deck.drawCard());
-        this.triggerUIUpdate(); // Update UI after hit
+        console.log(`${this.currentPlayer.name} new score: ${this.currentPlayer.score}`);
+        this.triggerUIUpdate();
         
         this.checkGameState();
         
-        // Reveal enemy cards if player busts
-        if (this.player1.score > 21) {
+        // In AI vs AI, always reveal cards
+        if (this.isAIVsAI) {
+            this.revealEnemyCards = true;
+        } else if (this.player1.isBust()) {
             this.revealEnemyCards = true;
         }
         
-        // If game is not over and it's still AI's turn, continue their turn
-        if (!this.gameOver && !this.currentPlayer.isHuman && !this.currentPlayer.isStanding) {
-            // Use setTimeout to avoid recursion and stack overflow
+        // Only continue AI turn if game is still active and it's still AI's turn and not bust
+        if (!this.gameOver && !this.currentPlayer.isHuman && !this.currentPlayer.isStanding && !this.currentPlayer.isBust()) {
             setTimeout(() => {
-                if (this.currentPlayer.shouldHit()) {
-                    this.hit();
-                } else {
-                    this.stand();
+                if (!this.gameOver && this.currentPlayer.shouldHit) {
+                    if (this.currentPlayer.shouldHit()) {
+                        this.hit();
+                    } else {
+                        this.stand();
+                    }
                 }
             }, 1000);
         } else {
@@ -104,16 +154,16 @@ export class Game {
             return;
         }
         
-        console.log(`${this.currentPlayer.name} stands`);
+        console.log(`${this.currentPlayer.name} stands with score: ${this.currentPlayer.score}`);
         this.currentPlayer.stand();
         
-        // Reveal enemy cards when human stands
-        if (this.currentPlayer === this.player1) {
+        // In AI vs AI or when human stands, reveal cards
+        if (this.isAIVsAI || this.currentPlayer === this.player1) {
             this.revealEnemyCards = true;
         }
         
         this.switchPlayer();
-        this.triggerUIUpdate(); // Update UI after stand
+        this.triggerUIUpdate();
         
         this.checkGameState();
         
@@ -121,101 +171,136 @@ export class Game {
     }
     
     switchPlayer() {
+        if (this.gameOver) return;
+        
         this.currentPlayer = this.currentPlayer === this.player1 ? this.player2 : this.player1;
-        console.log(`Switched to ${this.currentPlayer.name}'s turn`);
-        this.triggerUIUpdate(); // Update UI after player switch
+        console.log(`Switched to ${this.currentPlayer.name}'s turn, isHuman: ${this.currentPlayer.isHuman}`);
+        this.triggerUIUpdate();
     }
     
     checkGameState() {
-        // Check for bust
-        if (this.player1.score > 21) {
-            console.log('Player 1 busts!');
-            this.revealEnemyCards = true;
-            this.endGame(this.player2);
-            return;
-        }
-        
-        if (this.player2.score > 21) {
-            console.log('Player 2 busts!');
-            this.revealEnemyCards = true;
-            this.endGame(this.player1);
-            return;
-        }
-        
-        // Check if both players are standing
-        if (this.player1.isStanding && this.player2.isStanding) {
-            console.log('Both players stand - determining winner');
-            this.revealEnemyCards = true;
-            this.determineWinner();
-            return;
-        }
-        
-        // If it's AI's turn and game isn't over, continue their turn
-        if (!this.gameOver && !this.currentPlayer.isHuman && !this.currentPlayer.isStanding) {
-            setTimeout(() => this.handleAITurn(), 1000);
-        }
-        
-        this.triggerUIUpdate(); // Update UI after state check
+    if (this.gameOver) return;
+    
+    // Check for bust
+    if (this.player1.isBust()) {
+        console.log('Player 1 busts!');
+        this.revealEnemyCards = true;
+        this.endGame(this.player2);
+        return;
     }
     
+    if (this.player2.isBust()) {
+        console.log('Player 2 busts!');
+        this.revealEnemyCards = true;
+        this.endGame(this.player1);
+        return;
+    }
+    
+    // Check if both players are standing
+    if (this.player1.isStanding && this.player2.isStanding) {
+        console.log('Both players stand - determining winner');
+        this.revealEnemyCards = true;
+        this.determineWinner();
+        return;
+    }
+    
+    // In AI vs AI, always continue the game automatically
+    if (this.isAIVsAI && !this.gameOver && !this.currentPlayer.isStanding && !this.currentPlayer.isBust()) {
+        setTimeout(() => {
+            if (!this.gameOver) {
+                this.handleAITurn();
+            }
+        }, 1000);
+    }
+    // In human vs AI, only continue if it's AI's turn
+    else if (!this.gameOver && !this.currentPlayer.isHuman && !this.currentPlayer.isStanding && !this.currentPlayer.isBust()) {
+        setTimeout(() => {
+            if (!this.gameOver) {
+                this.handleAITurn();
+            }
+        }, 1000);
+    }
+    
+    this.triggerUIUpdate();
+}
+    
     determineWinner() {
-        console.log(`Determining winner: Player1: ${this.player1.score}, Player2: ${this.player2.score}`);
-        if (this.player1.score > this.player2.score) {
+        console.log(`Determining winner: ${this.player1.name}: ${this.player1.score}, ${this.player2.name}: ${this.player2.score}`);
+        
+        // If both bust, it's a tie
+        if (this.player1.isBust() && this.player2.isBust()) {
+            this.endGame(null);
+        }
+        // If player1 busts, player2 wins
+        else if (this.player1.isBust()) {
+            this.endGame(this.player2);
+        }
+        // If player2 busts, player1 wins
+        else if (this.player2.isBust()) {
+            this.endGame(this.player1);
+        }
+        // Otherwise, higher score wins
+        else if (this.player1.score > this.player2.score) {
             this.endGame(this.player1);
         } else if (this.player2.score > this.player1.score) {
             this.endGame(this.player2);
         } else {
-            this.endGame(null);
+            this.endGame(null); // Tie
         }
     }
     
     endGame(winner) {
-        console.log(`Game over! Winner: ${winner ? winner.name : 'Tie'}`);
-        this.gameOver = true;
-        this.winner = winner;
-        this.revealEnemyCards = true;
-        this.processingAITurn = false;
-        this.triggerUIUpdate(); // Update UI when game ends
+    console.log(`Game over! Winner: ${winner ? winner.name : 'Tie'}`);
+    this.gameOver = true;
+    this.winner = winner;
+    this.revealEnemyCards = true;
+    this.processingAITurn = false;
+    
+    // Debug: log the winner details
+    if (winner) {
+        console.log(`Winner details - name: "${winner.name}", isHuman: ${winner.isHuman}`);
+    } else {
+        console.log('Game ended in tie - no winner');
     }
     
-    resetGame() {
-        this.deck = new Deck();
-        this.player1.clearHand();
-        this.player2.clearHand();
-        this.currentPlayer = this.player1;
-        this.gameOver = false;
-        this.winner = null;
-        this.revealEnemyCards = false;
-        this.processingAITurn = false;
-        this.startGame();
-    }
+    // Trigger UI update first
+    this.triggerUIUpdate();
     
-    // Method to check if enemy cards should be shown
+    // Then trigger game end handling after a short delay to ensure UI is updated
+    setTimeout(() => {
+        if (this.onGameEnd) {
+            this.onGameEnd(winner);
+        }
+    }, 100);
+}
+
+setOnGameEnd(callback) {
+    this.onGameEnd = callback;
+}
+    
     shouldShowEnemyCards() {
+        // In AI vs AI, always show cards
+        if (this.isAIVsAI) return true;
         return this.revealEnemyCards || this.gameOver;
     }
     
-    // Method to get enemy hand for display (only second card hidden)
     getEnemyHandForDisplay() {
         if (this.shouldShowEnemyCards()) {
             return this.player2.hand.map(card => ({ ...card, isHidden: false }));
         } else {
-            // Return array with only the second card hidden
             return this.player2.hand.map((card, index) => ({
                 ...card,
-                isHidden: index === 1 // Hide only the second card (index 1)
+                isHidden: index === 1
             }));
         }
     }
     
-    // Method to get enemy score for display
     getEnemyScoreForDisplay() {
         if (this.shouldShowEnemyCards()) {
-            return this.player2.score; // Show actual score
+            return this.player2.score;
         } else {
-            // Only show the value of the first card when cards are hidden
             const firstCardValue = this.player2.hand.length > 0 ? this.player2.hand[0].value : 0;
-            return firstCardValue + ' + ?'; // Show "X + ?" format
+            return firstCardValue + ' + ?';
         }
     }
 }

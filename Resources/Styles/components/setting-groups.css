@@ -25,6 +25,13 @@
     margin-top: var(--space-sm);
 }
 
+.setting-hint {
+    display: block;
+    color: var(--color-black);
+    font-size: var(--font-size-xs);
+    margin-top: var(--space-sm);
+}
+
 .input-group {
     display: flex;
     align-items: center;

@@ -105,82 +105,108 @@ export class Leaderboard {
     }
 
     addEntry(entry) {
-        const newEntry = {
-            id: Date.now(),
-            playerName: entry.playerName || 'Player 1',
-            score: entry.score,
-            difficulty: entry.difficulty,
-            playerCount: entry.playerCount,
-            date: new Date().toISOString(),
-            duration: entry.duration,
-            wins: entry.wins,
-            totalGames: entry.totalGames
-        };
+    const newEntry = {
+        id: Date.now(),
+        playerName: entry.playerName || 'Player 1',
+        score: entry.score,
+        difficulty: entry.difficulty,
+        playerCount: entry.playerCount,
+        date: new Date().toISOString(),
+        duration: entry.duration,
+        wins: entry.wins,
+        totalGames: entry.totalGames
+    };
 
-        this.entries.push(newEntry);
-        this.entries.sort((a, b) => b.score - a.score); // Sort by score descending
-        this.saveEntries();
+    this.entries.push(newEntry);
+    this.entries.sort((a, b) => b.score - a.score); // Sort by score descending
+    this.saveEntries();
+    
+    // Only render if we're in the leaderboard view
+    if (document.getElementById('difficulty-filter')) {
         this.renderLeaderboard();
     }
+}
 
-    renderLeaderboard() {
-        const difficultyFilter = document.getElementById('difficulty-filter').value;
-        const playerCountFilter = document.getElementById('player-count-filter').value;
-        
-        let filteredEntries = this.entries;
-
-        // Apply filters
-        if (difficultyFilter !== 'all') {
-            filteredEntries = filteredEntries.filter(entry => entry.difficulty === difficultyFilter);
-        }
-
-        if (playerCountFilter !== 'all') {
-            if (playerCountFilter === '5+') {
-                filteredEntries = filteredEntries.filter(entry => entry.playerCount >= 5);
-            } else {
-                filteredEntries = filteredEntries.filter(entry => entry.playerCount === parseInt(playerCountFilter));
-            }
-        }
-
-        // Update stats
-        this.updateStats(filteredEntries);
-
-        // Render table
-        const tbody = document.getElementById('leaderboard-body');
-        tbody.innerHTML = '';
-
-        if (filteredEntries.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" class="no-entries">
-                        No tournament records found. Play some games to see your scores here!
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        filteredEntries.forEach((entry, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="rank-cell">
-                    <span class="rank-number">${index + 1}</span>
-                    ${index < 3 ? '<span class="medal">🥇</span>'.slice(0, 2 + index * 2) : ''}
-                </td>
-                <td class="player-cell">${entry.playerName}</td>
-                <td class="score-cell">${entry.score}</td>
-                <td class="difficulty-cell">
-                    <span class="difficulty-badge difficulty-${entry.difficulty}">
-                        ${this.capitalizeFirst(entry.difficulty)}
-                    </span>
-                </td>
-                <td class="players-cell">${entry.playerCount} players</td>
-                <td class="date-cell">${this.formatDate(entry.date)}</td>
-                <td class="duration-cell">${entry.duration}</td>
-            `;
-            tbody.appendChild(row);
-        });
+    // In leaderboards.js - update the renderLeaderboard method
+renderLeaderboard() {
+    const difficultyFilter = document.getElementById('difficulty-filter');
+    const playerCountFilter = document.getElementById('player-count-filter');
+    
+    // Check if filter elements exist (they only exist in the leaderboard view)
+    if (!difficultyFilter || !playerCountFilter) {
+        // This is normal when we're not in the leaderboard view
+        return;
     }
+    
+    const difficultyFilterValue = difficultyFilter.value;
+    const playerCountFilterValue = playerCountFilter.value;
+    
+    let filteredEntries = this.entries;
+
+    // Apply filters
+    if (difficultyFilterValue !== 'all') {
+        filteredEntries = filteredEntries.filter(entry => entry.difficulty === difficultyFilterValue);
+    }
+
+    if (playerCountFilterValue !== 'all') {
+        if (playerCountFilterValue === '5+') {
+            filteredEntries = filteredEntries.filter(entry => entry.playerCount >= 5);
+        } else {
+            filteredEntries = filteredEntries.filter(entry => entry.playerCount === parseInt(playerCountFilterValue));
+        }
+    }
+
+    // Update stats
+    this.updateStats(filteredEntries);
+
+    // Render table
+    const tbody = document.getElementById('leaderboard-body');
+    if (!tbody) {
+        console.log('Leaderboard table body not found');
+        return;
+    }
+    
+    tbody.innerHTML = '';
+
+    if (filteredEntries.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="no-entries">
+                    No tournament records found. Play some games to see your scores here!
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    filteredEntries.forEach((entry, index) => {
+        const row = document.createElement('tr');
+        
+        // Add medal emojis for top 3
+        let medal = '';
+        if (index === 0) medal = '🥇';
+        else if (index === 1) medal = '🥈';
+        else if (index === 2) medal = '🥉';
+        
+        row.innerHTML = `
+            <td class="rank-cell">
+                <span class="rank-number">${index + 1}</span>
+                ${medal}
+            </td>
+            <td class="player-cell">${entry.playerName}</td>
+            <td class="score-cell">${entry.score}</td>
+            <td class="difficulty-cell">
+                <span class="difficulty-badge difficulty-${entry.difficulty}">
+                    ${this.capitalizeFirst(entry.difficulty)}
+                </span>
+            </td>
+            <td class="players-cell">${entry.playerCount} players</td>
+            <td class="date-cell">${this.formatDate(entry.date)}</td>
+            <td class="duration-cell">${entry.duration}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
     updateStats(entries) {
         document.getElementById('total-tournaments').textContent = entries.length;

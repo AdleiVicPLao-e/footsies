@@ -13,6 +13,8 @@ export class Lobby {
         };
         this.currentDifficulty = 'medium';
         this.enemyCount = 3;
+        this.MAX_ENEMIES = 8; // Add maximum limit
+        this.MIN_ENEMIES = 1; // Add minimum limit
     }
 
     initializeLobbyUI() {
@@ -25,7 +27,8 @@ export class Lobby {
         return `
             <div class="lobby-container">
                 <header class="lobby-header">
-                    <h1>🎮 Blackjack Tournament Lobby</h1>
+                    <img src="./Resources/Assets/Images/logo.png" alt="Game Logo" class="logo">
+                    <h1>Blackjack Tournament Lobby</h1>
                     <p class="subtitle">Configure your tournament settings</p>
                 </header>
 
@@ -34,11 +37,16 @@ export class Lobby {
                         <div class="setting-group">
                             <label for="enemy-count" class="setting-label">Number of AI Players:</label>
                             <div class="input-group">
-                                <button class="btn-stepper" id="decrease-enemies">-</button>
-                                <input type="number" id="enemy-count" class="number-input" value="3" min="1" max="8">
-                                <button class="btn-stepper" id="increase-enemies">+</button>
+                                <button class="btn-stepper" id="decrease-enemies" type="button">-</button>
+                                <input type="number" id="enemy-count" class="number-input" 
+                                       value="${this.enemyCount}" 
+                                       min="${this.MIN_ENEMIES}" 
+                                       max="${this.MAX_ENEMIES}"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <button class="btn-stepper" id="increase-enemies" type="button">+</button>
                             </div>
-                            <span class="setting-description">Total players: <span id="total-players">4</span> (You + <span id="ai-count">3</span> AI)</span>
+                            <span class="setting-description">Total players: <span id="total-players">${this.enemyCount + 1}</span> (You + <span id="ai-count">${this.enemyCount}</span> AI)</span>
+                            <span class="setting-hint">Max: ${this.MAX_ENEMIES} AI players</span>
                         </div>
 
                         <div class="setting-group">
@@ -46,7 +54,7 @@ export class Lobby {
                             <div class="difficulty-options" id="difficulty-options">
                                 ${this.createDifficultyOptions()}
                             </div>
-                            <span class="setting-description" id="difficulty-description">Intermediate - Balanced play</span>
+                            <span class="setting-description" id="difficulty-description">${this.difficultySettings[this.currentDifficulty].description}</span>
                         </div>
 
                         <div class="setting-group" id="mixed-difficulty-group">
@@ -100,14 +108,22 @@ export class Lobby {
         const distribution = this.calculateAIDistribution();
         const totalGames = this.calculateTotalGames(this.enemyCount + 1);
         
+        // Format large numbers to be readable
+        const formatNumber = (num) => {
+            if (num > 1000) {
+                return num.toLocaleString();
+            }
+            return num.toString();
+        };
+
         return `
             <div class="preview-item">
                 <span>Total Players:</span>
-                <span>${this.enemyCount + 1}</span>
+                <span>${formatNumber(this.enemyCount + 1)}</span>
             </div>
             <div class="preview-item">
                 <span>Total Games:</span>
-                <span>${totalGames}</span>
+                <span>${formatNumber(totalGames)}</span>
             </div>
             <div class="preview-item">
                 <span>AI Types:</span>
@@ -149,6 +165,10 @@ export class Lobby {
     }
 
     estimateDuration(totalGames) {
+        if (totalGames > 1000) {
+            return "Very long - consider fewer players";
+        }
+        
         const minutes = Math.ceil(totalGames * 2); // ~2 minutes per game
         if (minutes < 60) return `${minutes} minutes`;
         const hours = Math.floor(minutes / 60);
@@ -160,7 +180,9 @@ export class Lobby {
         // Enemy count controls
         document.getElementById('decrease-enemies').addEventListener('click', () => this.adjustEnemyCount(-1));
         document.getElementById('increase-enemies').addEventListener('click', () => this.adjustEnemyCount(1));
-        document.getElementById('enemy-count').addEventListener('change', (e) => this.setEnemyCount(parseInt(e.target.value)));
+        document.getElementById('enemy-count').addEventListener('input', (e) => this.handleEnemyCountInput(e));
+        document.getElementById('enemy-count').addEventListener('change', (e) => this.handleEnemyCountChange(e));
+        document.getElementById('enemy-count').addEventListener('blur', (e) => this.validateEnemyCount(e));
 
         // Difficulty selection
         document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
@@ -172,17 +194,52 @@ export class Lobby {
         document.getElementById('view-leaderboard').addEventListener('click', () => this.viewLeaderboard());
     }
 
-    adjustEnemyCount(change) {
-        const newCount = Math.max(1, Math.min(8, this.enemyCount + change));
+     adjustEnemyCount(change) {
+        const newCount = Math.max(this.MIN_ENEMIES, Math.min(this.MAX_ENEMIES, this.enemyCount + change));
         this.setEnemyCount(newCount);
     }
 
     setEnemyCount(count) {
-        this.enemyCount = count;
-        document.getElementById('enemy-count').value = count;
-        document.getElementById('ai-count').textContent = count;
-        document.getElementById('total-players').textContent = count + 1;
+        // Ensure count is within bounds
+        const validCount = Math.max(this.MIN_ENEMIES, Math.min(this.MAX_ENEMIES, count));
+        
+        this.enemyCount = validCount;
+        const enemyInput = document.getElementById('enemy-count');
+        if (enemyInput) {
+            enemyInput.value = validCount;
+        }
+        document.getElementById('ai-count').textContent = validCount;
+        document.getElementById('total-players').textContent = validCount + 1;
         this.updateUI();
+    }
+
+    handleEnemyCountInput(e) {
+        // Prevent non-numeric input
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    }
+
+    handleEnemyCountChange(e) {
+        let value = parseInt(e.target.value);
+        
+        if (isNaN(value)) {
+            // If not a number, reset to current count
+            this.setEnemyCount(this.enemyCount);
+            return;
+        }
+        
+        this.setEnemyCount(value);
+    }
+
+    validateEnemyCount(e) {
+        let value = parseInt(e.target.value);
+        
+        if (isNaN(value) || value < this.MIN_ENEMIES) {
+            this.setEnemyCount(this.MIN_ENEMIES);
+        } else if (value > this.MAX_ENEMIES) {
+            this.setEnemyCount(this.MAX_ENEMIES);
+        } else {
+            this.setEnemyCount(value);
+        }
     }
 
     setDifficulty(difficulty) {
@@ -217,22 +274,36 @@ export class Lobby {
         document.dispatchEvent(event);
     }
 
-    generateEnemyConfigs() {
-        const distribution = this.calculateAIDistribution();
-        const configs = [];
+    // In lobby.js - update generateEnemyConfigs method
+generateEnemyConfigs() {
+    const distribution = this.calculateAIDistribution();
+    const configs = [];
+    
+    // Map enemy types to your back design names
+    const enemyTypeDesigns = {
+        'BeginnerEnemy': 'easy',
+        'IntermediateEnemy': 'intermediate',
+        'ExpertEnemy': 'expert', 
+        'RandomEnemy': 'random',
+        'AdaptiveEnemy': 'adaptive'
+    };
 
-        Object.entries(distribution).forEach(([difficulty, count]) => {
-            for (let i = 1; i <= count; i++) {
-                configs.push({
-                    name: `${this.capitalizeFirst(difficulty)} AI ${i}`,
-                    difficulty: difficulty,
-                    type: this.getEnemyType(difficulty)
-                });
-            }
-        });
+    Object.entries(distribution).forEach(([difficulty, count]) => {
+        for (let i = 1; i <= count; i++) {
+            const enemyType = this.getEnemyType(difficulty);
+            const cardDesign = enemyTypeDesigns[enemyType];
+            
+            configs.push({
+                name: `${this.capitalizeFirst(difficulty)} AI ${i}`,
+                difficulty: difficulty,
+                type: enemyType,
+                cardDesign: cardDesign
+            });
+        }
+    });
 
-        return configs;
-    }
+    return configs;
+}
 
     getEnemyType(difficulty) {
         const types = {

@@ -57,7 +57,9 @@ export class DOMBuilder {
                         
                         <div class="leaderboard">
                             <h3>🏆 Current Standings</h3>
-                            <ul class="leaderboard-list" id="leaderboard-list"></ul>
+                            <div class="tournament-leaderboard">
+                                <ul class="leaderboard-list" id="leaderboard-list"></ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -79,6 +81,11 @@ export class DOMBuilder {
 
     static initializeGameInfo() {
         const gameInfoList = document.getElementById('game-info-list');
+        if (!gameInfoList) {
+            console.error('Game info list element not found!');
+            return;
+        }
+        
         gameInfoList.innerHTML = `
             <div class="info-item">
                 <span class="info-label">Current Player:</span>
@@ -96,16 +103,24 @@ export class DOMBuilder {
                 <span class="info-label">Deck Cards:</span>
                 <span class="info-value" id="deck-count">52</span>
             </div>
+            <div class="info-item">
+                <span class="info-label">Game Type:</span>
+                <span class="info-value" id="game-type">Human vs AI</span>
+            </div>
         `;
 
         // Add buttons dynamically
         const buttonsContainer = document.getElementById('buttons-container');
+        if (!buttonsContainer) {
+            console.error('Buttons container not found!');
+            return;
+        }
+        
         buttonsContainer.innerHTML = ''; // Clear existing buttons
         
         buttonsContainer.appendChild(this.createButton('hit-btn', 'Hit', 'btn btn-hit'));
         buttonsContainer.appendChild(this.createButton('stand-btn', 'Stand', 'btn btn-stand'));
         buttonsContainer.appendChild(this.createButton('next-btn', 'Next Game', 'btn btn-next'));
-        buttonsContainer.appendChild(this.createButton('reset-btn', 'Reset Tournament', 'btn btn-reset'));
         buttonsContainer.appendChild(this.createButton('lobby-btn', 'Back to Lobby', 'btn btn-secondary'));
     }
 
@@ -117,31 +132,74 @@ export class DOMBuilder {
         return button;
     }
 
-    // In DOMBuilder.js - update the createCardElement method
-static createCardElement(card, isFaceUp = true) {
-    const cardElem = document.createElement('div');
-    
-    if (isFaceUp && !card.isHidden) {
-        const isRed = card.suit === 'Hearts' || card.suit === 'Diamonds';
-        cardElem.className = `card ${isRed ? 'red' : 'black'} card-dealing`;
-        cardElem.innerHTML = `
-            <div class="card-top">
-                <div>${card.rank}</div>
-                <div>${this.getSuitSymbol(card.suit)}</div>
-            </div>
-            <div class="card-center">${this.getSuitSymbol(card.suit)}</div>
-            <div class="card-bottom">
-                <div>${card.rank}</div>
-                <div>${this.getSuitSymbol(card.suit)}</div>
-            </div>
-        `;
-    } else {
-        cardElem.className = 'card card-back card-dealing';
-        cardElem.innerHTML = `<div class="card-hidden">?</div>`;
+    static createCardElement(card, isFaceUp = true, backDesign = 'player') {
+        const cardElem = document.createElement('div');
+        cardElem.className = 'card-img-container card-dealing';
+        
+        const img = document.createElement('img');
+        img.alt = isFaceUp && !card.isHidden ? card.toString() : 'Card Back';
+        img.className = 'card-image';
+        
+        if (isFaceUp && !card.isHidden) {
+            img.src = card.imagePath;
+            img.onerror = () => {
+                console.warn(`Card image not found: ${card.imagePath}, using fallback`);
+                this.createFallbackCard(cardElem, card, true);
+            };
+        } else {
+            // Use the new naming convention for card backs
+            img.src = this.getBackImagePath(backDesign);
+            img.onerror = () => {
+                console.warn(`Card back image not found for design: ${backDesign}, using fallback`);
+                this.createFallbackCard(cardElem, card, false);
+            };
+        }
+        
+        cardElem.appendChild(img);
+        return cardElem;
     }
-    
-    return cardElem;
-}
+
+    static getBackImagePath(backDesign = 'player') {
+        // Map the back design names to your file names
+        const backDesignMap = {
+            'player': 'back_player',
+            'easy': 'back_easy',
+            'intermediate': 'back_intermediate',
+            'expert': 'back_expert',
+            'random': 'back_random',
+            'adaptive': 'back_adaptive'
+        };
+        
+        const fileName = backDesignMap[backDesign] || 'back_player';
+        return `./Resources/Assets/Images/Cards/${fileName}.png`;
+    }
+
+    static createFallbackCard(container, card, isFaceUp) {
+        // Fallback to CSS cards if images don't load
+        container.innerHTML = '';
+        const fallbackCard = document.createElement('div');
+        
+        if (isFaceUp) {
+            const isRed = card.suit === 'Hearts' || card.suit === 'Diamonds';
+            fallbackCard.className = `card ${isRed ? 'red' : 'black'} card-dealing`;
+            fallbackCard.innerHTML = `
+                <div class="card-top">
+                    <div>${card.rank}</div>
+                    <div>${this.getSuitSymbol(card.suit)}</div>
+                </div>
+                <div class="card-center">${this.getSuitSymbol(card.suit)}</div>
+                <div class="card-bottom">
+                    <div>${card.rank}</div>
+                    <div>${this.getSuitSymbol(card.suit)}</div>
+                </div>
+            `;
+        } else {
+            fallbackCard.className = 'card card-back card-dealing';
+            fallbackCard.innerHTML = `<div class="card-hidden">?</div>`;
+        }
+        
+        container.appendChild(fallbackCard);
+    }
 
     static getSuitSymbol(suit) {
         const symbols = {
@@ -151,5 +209,41 @@ static createCardElement(card, isFaceUp = true) {
             'Spades': '♠'
         };
         return symbols[suit] || suit;
+    }
+
+    // New method to update game info dynamically
+    static updateGameInfo(currentPlayer, gameStatus, deckCount, gameType = 'Human vs AI') {
+        const currentPlayerElem = document.getElementById('current-player');
+        const gameStatusElem = document.getElementById('game-status');
+        const deckCountElem = document.getElementById('deck-count');
+        const gameTypeElem = document.getElementById('game-type');
+
+        if (currentPlayerElem) currentPlayerElem.textContent = currentPlayer;
+        if (gameStatusElem) gameStatusElem.textContent = gameStatus;
+        if (deckCountElem) deckCountElem.textContent = deckCount;
+        if (gameTypeElem) gameTypeElem.textContent = gameType;
+    }
+
+    // New method to update games played
+    static updateGamesPlayed(currentGame, totalGames) {
+        const gamesPlayedElem = document.getElementById('games-played');
+        if (gamesPlayedElem) {
+            gamesPlayedElem.textContent = `${currentGame - 1}/${totalGames}`;
+        }
+    }
+
+    // New method to update tournament progress
+    static updateTournamentProgress(currentGame, totalGames) {
+        const gameCountElem = document.getElementById('game-count');
+        const progressFillElem = document.getElementById('progress-fill');
+        
+        if (gameCountElem) {
+            gameCountElem.textContent = `Game ${currentGame} of ${totalGames}`;
+        }
+        
+        if (progressFillElem) {
+            const progress = (currentGame / totalGames) * 100;
+            progressFillElem.style.width = `${progress}%`;
+        }
     }
 }
