@@ -180,7 +180,7 @@ export class DOMBuilder {
         const fallbackCard = document.createElement('div');
         
         if (isFaceUp) {
-            const isRed = card.suit === 'Hearts' || card.suit === 'Diamonds';
+            const isRed = card.suit === 'hearts' || card.suit === 'diamonds';
             fallbackCard.className = `card ${isRed ? 'red' : 'black'} card-dealing`;
             fallbackCard.innerHTML = `
                 <div class="card-top">
@@ -203,10 +203,10 @@ export class DOMBuilder {
 
     static getSuitSymbol(suit) {
         const symbols = {
-            'Hearts': '♥',
-            'Diamonds': '♦',
-            'Clubs': '♣',
-            'Spades': '♠'
+            'hearts': '♥',
+            'diamonds': '♦',
+            'clubs': '♣',
+            'spades': '♠'
         };
         return symbols[suit] || suit;
     }

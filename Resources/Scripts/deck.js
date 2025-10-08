@@ -8,15 +8,15 @@ export class Deck {
     }
     
     initializeDeck() {
-        const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+        const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
         const ranks = [
             { rank: '2', value: 2 }, { rank: '3', value: 3 },
             { rank: '4', value: 4 }, { rank: '5', value: 5 },
             { rank: '6', value: 6 }, { rank: '7', value: 7 },
             { rank: '8', value: 8 }, { rank: '9', value: 9 },
-            { rank: '10', value: 10 }, { rank: 'Jack', value: 10 },
-            { rank: 'Queen', value: 10 }, { rank: 'King', value: 10 },
-            { rank: 'Ace', value: 11 }
+            { rank: '10', value: 10 }, { rank: 'jack', value: 10 },
+            { rank: 'queen', value: 10 }, { rank: 'king', value: 10 },
+            { rank: 'ace', value: 11 }
         ];
         
         for (let suit of suits) {
