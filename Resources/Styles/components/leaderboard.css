@@ -1,53 +1,54 @@
 /* styles/components/leaderboard.css */
-@import url('leaderboard-root.css');
-@import url('leaderboard-base.css');
-@import url('leaderboard-filters.css');
-@import url('leaderboard-stats.css');
-@import url('leaderboard-table.css');
-@import url('leaderboard-badges.css');
-@import url('leaderboard-actions.css');
-@import url('leaderboard-responsive.css');
-@import url('leaderboard-animations.css');
+@import url("leaderboard-root.css");
+@import url("leaderboard-base.css");
+@import url("leaderboard-filters.css");
+@import url("leaderboard-stats.css");
+@import url("leaderboard-table.css");
+@import url("leaderboard-badges.css");
+@import url("leaderboard-actions.css");
+@import url("leaderboard-responsive.css");
+@import url("leaderboard-animations.css");
 
 /* Additional Leaderboard Styles */
 .leaderboard-container {
-    font-family: var(--font-family-primary);
+  font-family: var(--font-family-primary);
 }
 
 /* Empty state styling */
 .no-entries {
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>') no-repeat center top;
-    background-size: 64px 64px;
-    padding-top: 80px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>')
+    no-repeat center top;
+  background-size: 64px 64px;
+  padding-top: 80px;
 }
 
 .no-entries::before {
-    content: 'No records yet';
-    display: block;
-    font-size: var(--font-size-lg);
-    font-weight: bold;
-    color: var(--color-primary);
-    margin-bottom: var(--space-sm);
+  content: "No records yet";
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-bottom: var(--space-sm);
 }
 
 /* Loading state */
 .leaderboard-table tbody tr.skeleton {
-    animation: pulse 1.5s infinite;
+  animation: pulse 1.5s infinite;
 }
 
 .leaderboard-table tbody tr.skeleton td {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-    color: transparent;
-    border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  color: transparent;
+  border-radius: var(--radius-sm);
 }
 
 @keyframes loading {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }

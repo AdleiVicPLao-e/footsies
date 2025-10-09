@@ -1,110 +1,110 @@
 /* styles/components/leaderboard-table.css */
 .leaderboard-list-container {
-    background: var(--leaderboard-bg-card);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--leaderboard-shadow);
-    overflow: hidden;
+  background: var(--leaderboard-bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--leaderboard-shadow);
+  overflow: hidden;
 }
 
 .leaderboard-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: var(--font-size-base);
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-base);
 }
 
 .leaderboard-table thead {
-    background: var(--table-header-bg);
+  background: var(--table-header-bg);
 }
 
 .leaderboard-table th {
-    padding: var(--space-lg);
-    text-align: left;
-    color: var(--color-white);
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: var(--font-size-sm);
-    border-bottom: 2px solid var(--table-border);
+  padding: var(--space-lg);
+  text-align: left;
+  color: var(--color-white);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: var(--font-size-sm);
+  border-bottom: 2px solid var(--table-border);
 }
 
 .leaderboard-table th:first-child {
-    border-radius: var(--radius-lg) 0 0 0;
+  border-radius: var(--radius-lg) 0 0 0;
 }
 
 .leaderboard-table th:last-child {
-    border-radius: 0 var(--radius-lg) 0 0;
+  border-radius: 0 var(--radius-lg) 0 0;
 }
 
 .leaderboard-table tbody tr {
-    transition: all var(--transition-normal);
-    border-bottom: 1px solid var(--table-border);
+  transition: all var(--transition-normal);
+  border-bottom: 1px solid var(--table-border);
 }
 
 .leaderboard-table tbody tr:nth-child(even) {
-    background: var(--table-row-even);
+  background: var(--table-row-even);
 }
 
 .leaderboard-table tbody tr:hover {
-    background: var(--table-row-hover);
-    transform: scale(1.01);
+  background: var(--table-row-hover);
+  transform: scale(1.01);
 }
 
 .leaderboard-table td {
-    padding: var(--space-lg);
-    vertical-align: middle;
+  padding: var(--space-lg);
+  vertical-align: middle;
 }
 
 /* Specific column styles */
 .rank-cell {
-    font-weight: bold;
-    text-align: center;
-    width: 80px;
-    position: relative;
+  font-weight: bold;
+  text-align: center;
+  width: 80px;
+  position: relative;
 }
 
 .rank-number {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    background: rgba(76, 175, 80, 0.1);
-    border-radius: 50%;
-    color: var(--color-primary);
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 50%;
+  color: var(--color-primary);
 }
 
 .medal {
-    margin-left: var(--space-sm);
-    font-size: var(--font-size-lg);
+  margin-left: var(--space-sm);
+  font-size: var(--font-size-lg);
 }
 
 .player-cell {
-    font-weight: bold;
-    color: var(--color-primary);
+  font-weight: bold;
+  color: var(--color-primary);
 }
 
 .score-cell {
-    font-weight: bold;
-    font-size: var(--font-size-lg);
-    color: var(--color-accent);
-    text-align: center;
+  font-weight: bold;
+  font-size: var(--font-size-lg);
+  color: var(--color-accent);
+  text-align: center;
 }
 
 .difficulty-cell {
-    text-align: center;
+  text-align: center;
 }
 
 .players-cell,
 .date-cell,
 .duration-cell {
-    text-align: center;
-    color: var(--color-gray-dark);
-    font-size: var(--font-size-sm);
+  text-align: center;
+  color: var(--color-gray-dark);
+  font-size: var(--font-size-sm);
 }
 
 .no-entries {
-    text-align: center;
-    padding: var(--space-2xl);
-    color: var(--color-gray-dark);
-    font-style: italic;
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--color-gray-dark);
+  font-style: italic;
 }

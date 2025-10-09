@@ -1,67 +1,77 @@
 /* styles/components/lobby.css */
-@import url('lobby-root.css');
-@import url('lobby-base.css');
-@import url('setting-groups.css');
-@import url('difficulty-options.css');
-@import url('distribution-display.css');
-@import url('tournament-preview.css');
-@import url('lobby-buttons.css');
-@import url('lobby-responsive.css');
+@import url("lobby-root.css");
+@import url("lobby-base.css");
+@import url("setting-groups.css");
+@import url("difficulty-options.css");
+@import url("distribution-display.css");
+@import url("tournament-preview.css");
+@import url("lobby-buttons.css");
+@import url("lobby-responsive.css");
 
 /* Additional Lobby Animations */
 .lobby-container {
-    animation: fadeIn 0.8s ease-out;
+  animation: fadeIn 0.8s ease-out;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .difficulty-option {
-    animation: slideIn 0.6s ease-out backwards;
+  animation: slideIn 0.6s ease-out backwards;
 }
 
-.difficulty-option:nth-child(1) { animation-delay: 0.1s; }
-.difficulty-option:nth-child(2) { animation-delay: 0.2s; }
-.difficulty-option:nth-child(3) { animation-delay: 0.3s; }
-.difficulty-option:nth-child(4) { animation-delay: 0.4s; }
-.difficulty-option:nth-child(5) { animation-delay: 0.5s; }
+.difficulty-option:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.difficulty-option:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.difficulty-option:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.difficulty-option:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.difficulty-option:nth-child(5) {
+  animation-delay: 0.5s;
+}
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Loading State */
 .btn.loading {
-    position: relative;
-    color: transparent;
+  position: relative;
+  color: transparent;
 }
 
 .btn.loading::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    top: 50%;
-    left: 50%;
-    margin-left: -10px;
-    margin-top: -10px;
-    border: 2px solid transparent;
-    border-top: 2px solid currentColor;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }

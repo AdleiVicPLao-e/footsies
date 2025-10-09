@@ -1,24 +1,29 @@
 /* styles/components/leaderboard-root.css */
 :root {
-    /* Leaderboard Specific Colors */
-    --leaderboard-bg-primary: linear-gradient(135deg, #2e7d32 0%, #388e3c 50%, #43a047 100%);
-    --leaderboard-bg-card: rgba(255, 255, 255, 0.95);
-    --leaderboard-bg-overlay: rgba(0, 0, 0, 0.1);
-    --leaderboard-border-color: #4caf50;
-    --leaderboard-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    
-    /* Medal Colors */
-    --medal-gold: #ffd700;
-    --medal-silver: #c0c0c0;
-    --medal-bronze: #cd7f32;
-    
-    /* Table Colors */
-    --table-header-bg: linear-gradient(135deg, #388e3c, #2e7d32);
-    --table-row-even: rgba(76, 175, 80, 0.05);
-    --table-row-hover: rgba(76, 175, 80, 0.1);
-    --table-border: rgba(76, 175, 80, 0.2);
-    
-    /* Stat Card Colors */
-    --stat-card-bg: linear-gradient(135deg, #4caf50, #388e3c);
-    --stat-card-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+  /* Leaderboard Specific Colors */
+  --leaderboard-bg-primary: linear-gradient(
+    135deg,
+    #2e7d32 0%,
+    #388e3c 50%,
+    #43a047 100%
+  );
+  --leaderboard-bg-card: rgba(255, 255, 255, 0.95);
+  --leaderboard-bg-overlay: rgba(0, 0, 0, 0.1);
+  --leaderboard-border-color: #4caf50;
+  --leaderboard-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+  /* Medal Colors */
+  --medal-gold: #ffd700;
+  --medal-silver: #c0c0c0;
+  --medal-bronze: #cd7f32;
+
+  /* Table Colors */
+  --table-header-bg: linear-gradient(135deg, #388e3c, #2e7d32);
+  --table-row-even: rgba(76, 175, 80, 0.05);
+  --table-row-hover: rgba(76, 175, 80, 0.1);
+  --table-border: rgba(76, 175, 80, 0.2);
+
+  /* Stat Card Colors */
+  --stat-card-bg: linear-gradient(135deg, #4caf50, #388e3c);
+  --stat-card-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
 }

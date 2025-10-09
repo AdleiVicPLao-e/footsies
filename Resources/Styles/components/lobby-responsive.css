@@ -1,66 +1,66 @@
 /* styles/components/lobby-responsive.css */
 @media (max-width: 1024px) {
-    .lobby-content {
-        grid-template-columns: 1fr;
-        gap: var(--space-xl);
-    }
-    
-    .lobby-actions {
-        flex-direction: row;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    .lobby-actions .btn {
-        max-width: 250px;
-    }
+  .lobby-content {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+
+  .lobby-actions {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .lobby-actions .btn {
+    max-width: 250px;
+  }
 }
 
 @media (max-width: 768px) {
-    .lobby-container {
-        padding: var(--space-md);
-    }
-    
-    .lobby-header {
-        padding: var(--space-xl);
-        margin-bottom: var(--space-xl);
-    }
-    
-    .lobby-header h1 {
-        font-size: var(--font-size-3xl);
-    }
-    
-    .settings-panel {
-        padding: var(--space-xl);
-    }
-    
-    .difficulty-options {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .input-group {
-        max-width: 100%;
-    }
+  .lobby-container {
+    padding: var(--space-md);
+  }
+
+  .lobby-header {
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+  }
+
+  .lobby-header h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .settings-panel {
+    padding: var(--space-xl);
+  }
+
+  .difficulty-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .input-group {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-    .lobby-header h1 {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .difficulty-options {
-        grid-template-columns: 1fr;
-    }
-    
-    .lobby-actions {
-        flex-direction: column;
-    }
-    
-    .lobby-actions .btn {
-        max-width: 100%;
-    }
-    
-    .setting-label {
-        font-size: var(--font-size-base);
-    }
+  .lobby-header h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .difficulty-options {
+    grid-template-columns: 1fr;
+  }
+
+  .lobby-actions {
+    flex-direction: column;
+  }
+
+  .lobby-actions .btn {
+    max-width: 100%;
+  }
+
+  .setting-label {
+    font-size: var(--font-size-base);
+  }
 }

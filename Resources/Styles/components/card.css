@@ -1,150 +1,159 @@
 /* styles/components/card.css */
 .card-img-container {
-    width: var(--card-width);
-    height: var(--card-height);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    position: relative;
-    transition: transform var(--transition-normal);
-    overflow: hidden;
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  transition: transform var(--transition-normal);
+  overflow: hidden;
 }
 
 .card-img-container:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 .card-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--radius-md);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-md);
 }
 
 .card-dealing {
-    animation: dealCard 0.5s ease-out;
+  animation: dealCard 0.5s ease-out;
 }
 
 /* Fallback CSS cards (keep these as backup) */
 .card {
-    width: var(--card-width);
-    height: var(--card-height);
-    background: var(--color-white);
-    border-radius: var(--radius-md);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: var(--space-md);
-    color: var(--color-black);
-    font-weight: bold;
-    box-shadow: var(--shadow-md);
-    position: relative;
-    transition: transform var(--transition-normal);
+  width: var(--card-width);
+  height: var(--card-height);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-md);
+  color: var(--color-black);
+  font-weight: bold;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  transition: transform var(--transition-normal);
 }
 
 .card:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 .card.red {
-    color: #dc143c;
+  color: #dc143c;
 }
 
 .card.black {
-    color: var(--color-black);
+  color: var(--color-black);
 }
 
-.card-top, .card-bottom {
-    font-size: var(--font-size-sm);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+.card-top,
+.card-bottom {
+  font-size: var(--font-size-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .card-bottom {
-    align-items: flex-end;
-    transform: rotate(180deg);
+  align-items: flex-end;
+  transform: rotate(180deg);
 }
 
 .card-center {
-    font-size: var(--font-size-2xl);
-    text-align: center;
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  font-size: var(--font-size-2xl);
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-back {
-    background: linear-gradient(45deg, #dc143c, var(--color-secondary));
-    color: var(--color-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-xs);
+  background: linear-gradient(45deg, #dc143c, var(--color-secondary));
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
 }
 
 .card-back::before {
-    content: "BJ";
-    font-size: var(--font-size-lg);
-    font-weight: bold;
+  content: "BJ";
+  font-size: var(--font-size-lg);
+  font-weight: bold;
 }
 
 /* Optional: Add visual indicators for player types */
 .player.human .player-name::before {
-    content: "👤 ";
+  content: "👤 ";
 }
 
 .player.enemy .player-name::before {
-    content: "🤖 ";
+  content: "🤖 ";
 }
+
 /* In card.css - enhance the player styling */
 .player.human {
-    border-left: 4px solid #dc143c; /* Red for human */
+  border-left: 4px solid #dc143c;
+  /* Red for human */
 }
 
 .player.enemy[data-difficulty="easy"] {
-    border-left: 4px solid #4CAF50; /* Green for easy */
+  border-left: 4px solid #4caf50;
+  /* Green for easy */
 }
 
 .player.enemy[data-difficulty="medium"] {
-    border-left: 4px solid #2196F3; /* Blue for medium */
+  border-left: 4px solid #2196f3;
+  /* Blue for medium */
 }
 
 .player.enemy[data-difficulty="hard"] {
-    border-left: 4px solid #9C27B0; /* Purple for hard */
+  border-left: 4px solid #9c27b0;
+  /* Purple for hard */
 }
 
 .player.enemy[data-difficulty="random"] {
-    border-left: 4px solid #FF9800; /* Orange for random */
+  border-left: 4px solid #ff9800;
+  /* Orange for random */
 }
 
 .player.enemy[data-difficulty="adaptive"] {
-    border-left: 4px solid #FFD700; /* Gold for adaptive */
+  border-left: 4px solid #ffd700;
+  /* Gold for adaptive */
 }
 
 /* Add tooltip for enemy types */
 .player.enemy .player-name::after {
-    content: " (" attr(data-difficulty) ")";
-    font-size: 0.8em;
-    opacity: 0.7;
-    text-transform: capitalize;
+  content: " (" attr(data-difficulty) ")";
+  font-size: 0.8em;
+  opacity: 0.7;
+  text-transform: capitalize;
 }
 
 @keyframes dealCard {
-    0% {
-        transform: translateY(-100px) rotate(-10deg);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0) rotate(0);
-        opacity: 1;
-    }
+  0% {
+    transform: translateY(-100px) rotate(-10deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0) rotate(0);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {
-    .card-img-container,
-    .card {
-        width: var(--card-width-mobile);
-        height: var(--card-height-mobile);
-    }
+  .card-img-container,
+  .card {
+    width: var(--card-width-mobile);
+    height: var(--card-height-mobile);
+  }
 }

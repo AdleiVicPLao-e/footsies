@@ -1,46 +1,46 @@
 /* styles/components/leaderboard-badges.css */
 .difficulty-badge {
-    display: inline-block;
-    padding: var(--space-xs) var(--space-md);
-    border-radius: 20px;
-    font-size: var(--font-size-xs);
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 20px;
+  font-size: var(--font-size-xs);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .difficulty-badge.difficulty-easy {
-    background: color-mix(in srgb, var(--difficulty-easy) 20%, transparent);
-    border: 1px solid var(--difficulty-easy);
-    color: var(--difficulty-easy);
+  background: color-mix(in srgb, var(--difficulty-easy) 20%, transparent);
+  border: 1px solid var(--difficulty-easy);
+  color: var(--difficulty-easy);
 }
 
 .difficulty-badge.difficulty-medium {
-    background: color-mix(in srgb, var(--difficulty-medium) 20%, transparent);
-    border: 1px solid var(--difficulty-medium);
-    color: var(--difficulty-medium);
+  background: color-mix(in srgb, var(--difficulty-medium) 20%, transparent);
+  border: 1px solid var(--difficulty-medium);
+  color: var(--difficulty-medium);
 }
 
 .difficulty-badge.difficulty-hard {
-    background: color-mix(in srgb, var(--difficulty-hard) 20%, transparent);
-    border: 1px solid var(--difficulty-hard);
-    color: var(--difficulty-hard);
+  background: color-mix(in srgb, var(--difficulty-hard) 20%, transparent);
+  border: 1px solid var(--difficulty-hard);
+  color: var(--difficulty-hard);
 }
 
 .difficulty-badge.difficulty-random {
-    background: color-mix(in srgb, var(--difficulty-random) 20%, transparent);
-    border: 1px solid var(--difficulty-random);
-    color: var(--difficulty-random);
+  background: color-mix(in srgb, var(--difficulty-random) 20%, transparent);
+  border: 1px solid var(--difficulty-random);
+  color: var(--difficulty-random);
 }
 
 .difficulty-badge.difficulty-adaptive {
-    background: color-mix(in srgb, var(--difficulty-adaptive) 20%, transparent);
-    border: 1px solid var(--difficulty-adaptive);
-    color: var(--difficulty-adaptive);
+  background: color-mix(in srgb, var(--difficulty-adaptive) 20%, transparent);
+  border: 1px solid var(--difficulty-adaptive);
+  color: var(--difficulty-adaptive);
 }
 
 .difficulty-badge.difficulty-mixed {
-    background: color-mix(in srgb, var(--difficulty-mixed) 20%, transparent);
-    border: 1px solid var(--difficulty-mixed);
-    color: var(--difficulty-mixed);
+  background: color-mix(in srgb, var(--difficulty-mixed) 20%, transparent);
+  border: 1px solid var(--difficulty-mixed);
+  color: var(--difficulty-mixed);
 }

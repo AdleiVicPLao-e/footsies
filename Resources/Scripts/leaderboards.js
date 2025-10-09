@@ -1,19 +1,19 @@
 // src/leaderboard.js
 export class Leaderboard {
-    constructor() {
-        this.storageKey = 'blackjack_leaderboard';
-        this.entries = this.loadEntries();
-    }
+  constructor() {
+    this.storageKey = "blackjack_leaderboard";
+    this.entries = this.loadEntries();
+  }
 
-    initializeLeaderboardUI() {
-        const app = document.getElementById('app');
-        app.innerHTML = this.createLeaderboardHTML();
-        this.attachLeaderboardEventListeners();
-        this.renderLeaderboard();
-    }
+  initializeLeaderboardUI() {
+    const app = document.getElementById("app");
+    app.innerHTML = this.createLeaderboardHTML();
+    this.attachLeaderboardEventListeners();
+    this.renderLeaderboard();
+  }
 
-    createLeaderboardHTML() {
-        return `
+  createLeaderboardHTML() {
+    return `
             <div class="leaderboard-container">
                 <header class="leaderboard-header">
                     <h1>🏆 Tournament Hall of Fame</h1>
@@ -94,101 +94,117 @@ export class Leaderboard {
                 </div>
             </div>
         `;
-    }
+  }
 
-    attachLeaderboardEventListeners() {
-        document.getElementById('difficulty-filter').addEventListener('change', () => this.renderLeaderboard());
-        document.getElementById('player-count-filter').addEventListener('change', () => this.renderLeaderboard());
-        document.getElementById('clear-leaderboard').addEventListener('click', () => this.clearLeaderboard());
-        document.getElementById('back-to-lobby').addEventListener('click', () => this.backToLobby());
-        document.getElementById('export-data').addEventListener('click', () => this.exportData());
-    }
+  attachLeaderboardEventListeners() {
+    document
+      .getElementById("difficulty-filter")
+      .addEventListener("change", () => this.renderLeaderboard());
+    document
+      .getElementById("player-count-filter")
+      .addEventListener("change", () => this.renderLeaderboard());
+    document
+      .getElementById("clear-leaderboard")
+      .addEventListener("click", () => this.clearLeaderboard());
+    document
+      .getElementById("back-to-lobby")
+      .addEventListener("click", () => this.backToLobby());
+    document
+      .getElementById("export-data")
+      .addEventListener("click", () => this.exportData());
+  }
 
-    addEntry(entry) {
+  addEntry(entry) {
     const newEntry = {
-        id: Date.now(),
-        playerName: entry.playerName || 'Player 1',
-        score: entry.score,
-        difficulty: entry.difficulty,
-        playerCount: entry.playerCount,
-        date: new Date().toISOString(),
-        duration: entry.duration,
-        wins: entry.wins,
-        totalGames: entry.totalGames
+      id: Date.now(),
+      playerName: entry.playerName || "Player 1",
+      score: entry.score,
+      difficulty: entry.difficulty,
+      playerCount: entry.playerCount,
+      date: new Date().toISOString(),
+      duration: entry.duration,
+      wins: entry.wins,
+      totalGames: entry.totalGames,
     };
 
     this.entries.push(newEntry);
     this.entries.sort((a, b) => b.score - a.score); // Sort by score descending
     this.saveEntries();
-    
-    // Only render if we're in the leaderboard view
-    if (document.getElementById('difficulty-filter')) {
-        this.renderLeaderboard();
-    }
-}
 
-    // In leaderboards.js - update the renderLeaderboard method
-renderLeaderboard() {
-    const difficultyFilter = document.getElementById('difficulty-filter');
-    const playerCountFilter = document.getElementById('player-count-filter');
-    
+    // Only render if we're in the leaderboard view
+    if (document.getElementById("difficulty-filter")) {
+      this.renderLeaderboard();
+    }
+  }
+
+  // In leaderboards.js - update the renderLeaderboard method
+  renderLeaderboard() {
+    const difficultyFilter = document.getElementById("difficulty-filter");
+    const playerCountFilter = document.getElementById("player-count-filter");
+
     // Check if filter elements exist (they only exist in the leaderboard view)
     if (!difficultyFilter || !playerCountFilter) {
-        // This is normal when we're not in the leaderboard view
-        return;
+      // This is normal when we're not in the leaderboard view
+      return;
     }
-    
+
     const difficultyFilterValue = difficultyFilter.value;
     const playerCountFilterValue = playerCountFilter.value;
-    
+
     let filteredEntries = this.entries;
 
     // Apply filters
-    if (difficultyFilterValue !== 'all') {
-        filteredEntries = filteredEntries.filter(entry => entry.difficulty === difficultyFilterValue);
+    if (difficultyFilterValue !== "all") {
+      filteredEntries = filteredEntries.filter(
+        (entry) => entry.difficulty === difficultyFilterValue
+      );
     }
 
-    if (playerCountFilterValue !== 'all') {
-        if (playerCountFilterValue === '5+') {
-            filteredEntries = filteredEntries.filter(entry => entry.playerCount >= 5);
-        } else {
-            filteredEntries = filteredEntries.filter(entry => entry.playerCount === parseInt(playerCountFilterValue));
-        }
+    if (playerCountFilterValue !== "all") {
+      if (playerCountFilterValue === "5+") {
+        filteredEntries = filteredEntries.filter(
+          (entry) => entry.playerCount >= 5
+        );
+      } else {
+        filteredEntries = filteredEntries.filter(
+          (entry) => entry.playerCount === parseInt(playerCountFilterValue)
+        );
+      }
     }
 
     // Update stats
     this.updateStats(filteredEntries);
 
     // Render table
-    const tbody = document.getElementById('leaderboard-body');
+    const tbody = document.getElementById("leaderboard-body");
     if (!tbody) {
-        console.log('Leaderboard table body not found');
-        return;
+      console.log("Leaderboard table body not found");
+      return;
     }
-    
-    tbody.innerHTML = '';
+
+    tbody.innerHTML = "";
 
     if (filteredEntries.length === 0) {
-        tbody.innerHTML = `
+      tbody.innerHTML = `
             <tr>
                 <td colspan="7" class="no-entries">
                     No tournament records found. Play some games to see your scores here!
                 </td>
             </tr>
         `;
-        return;
+      return;
     }
 
     filteredEntries.forEach((entry, index) => {
-        const row = document.createElement('tr');
-        
-        // Add medal emojis for top 3
-        let medal = '';
-        if (index === 0) medal = '🥇';
-        else if (index === 1) medal = '🥈';
-        else if (index === 2) medal = '🥉';
-        
-        row.innerHTML = `
+      const row = document.createElement("tr");
+
+      // Add medal emojis for top 3
+      let medal = "";
+      if (index === 0) medal = "🥇";
+      else if (index === 1) medal = "🥈";
+      else if (index === 2) medal = "🥉";
+
+      row.innerHTML = `
             <td class="rank-cell">
                 <span class="rank-number">${index + 1}</span>
                 ${medal}
@@ -204,73 +220,87 @@ renderLeaderboard() {
             <td class="date-cell">${this.formatDate(entry.date)}</td>
             <td class="duration-cell">${entry.duration}</td>
         `;
-        tbody.appendChild(row);
+      tbody.appendChild(row);
     });
-}
+  }
 
-    updateStats(entries) {
-        document.getElementById('total-tournaments').textContent = entries.length;
-        
-        const bestScore = entries.length > 0 ? Math.max(...entries.map(e => e.score)) : 0;
-        document.getElementById('best-score').textContent = bestScore;
+  updateStats(entries) {
+    document.getElementById("total-tournaments").textContent = entries.length;
 
-        const winRate = entries.length > 0 
-            ? Math.round((entries.reduce((sum, e) => sum + (e.wins / e.totalGames), 0) / entries.length) * 100)
-            : 0;
-        document.getElementById('win-rate').textContent = `${winRate}%`;
+    const bestScore =
+      entries.length > 0 ? Math.max(...entries.map((e) => e.score)) : 0;
+    document.getElementById("best-score").textContent = bestScore;
+
+    const winRate =
+      entries.length > 0
+        ? Math.round(
+            (entries.reduce((sum, e) => sum + e.wins / e.totalGames, 0) /
+              entries.length) *
+              100
+          )
+        : 0;
+    document.getElementById("win-rate").textContent = `${winRate}%`;
+  }
+
+  formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
+
+  capitalizeFirst(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  clearLeaderboard() {
+    if (
+      confirm(
+        "Are you sure you want to clear all leaderboard records? This cannot be undone."
+      )
+    ) {
+      this.entries = [];
+      this.saveEntries();
+      this.renderLeaderboard();
     }
+  }
 
-    formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
-    }
+  backToLobby() {
+    const event = new CustomEvent("showLobby");
+    document.dispatchEvent(event);
+  }
 
-    capitalizeFirst(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
+  exportData() {
+    const dataStr = JSON.stringify(this.entries, null, 2);
+    const dataBlob = new Blob([dataStr], {
+      type: "application/json",
+    });
 
-    clearLeaderboard() {
-        if (confirm('Are you sure you want to clear all leaderboard records? This cannot be undone.')) {
-            this.entries = [];
-            this.saveEntries();
-            this.renderLeaderboard();
-        }
-    }
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `blackjack_leaderboard_${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+    link.click();
+  }
 
-    backToLobby() {
-        const event = new CustomEvent('showLobby');
-        document.dispatchEvent(event);
+  loadEntries() {
+    try {
+      const stored = localStorage.getItem(this.storageKey);
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error("Error loading leaderboard entries:", error);
+      return [];
     }
+  }
 
-    exportData() {
-        const dataStr = JSON.stringify(this.entries, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(dataBlob);
-        link.download = `blackjack_leaderboard_${new Date().toISOString().split('T')[0]}.json`;
-        link.click();
+  saveEntries() {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.entries));
+    } catch (error) {
+      console.error("Error saving leaderboard entries:", error);
     }
-
-    loadEntries() {
-        try {
-            const stored = localStorage.getItem(this.storageKey);
-            return stored ? JSON.parse(stored) : [];
-        } catch (error) {
-            console.error('Error loading leaderboard entries:', error);
-            return [];
-        }
-    }
-
-    saveEntries() {
-        try {
-            localStorage.setItem(this.storageKey, JSON.stringify(this.entries));
-        } catch (error) {
-            console.error('Error saving leaderboard entries:', error);
-        }
-    }
+  }
 }

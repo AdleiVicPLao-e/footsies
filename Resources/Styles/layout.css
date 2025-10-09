@@ -1,41 +1,41 @@
 /* styles/layout.css */
 .container {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: var(--space-xl);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-xl);
 }
 
 .game-layout {
-    display: grid;
-    grid-template-columns: 1fr var(--sidebar-width);
-    gap: var(--space-xl);
-    margin-bottom: var(--space-xl);
+  display: grid;
+  grid-template-columns: 1fr var(--sidebar-width);
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
 }
 
 .players-container {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--space-xl);
-    margin-bottom: var(--space-2xl);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-2xl);
 }
 
 .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .game-layout {
-        grid-template-columns: 1fr;
-    }
-    
-    .players-container {
-        flex-direction: column;
-    }
-    
-    .container {
-        padding: var(--space-md);
-    }
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .players-container {
+    flex-direction: column;
+  }
+
+  .container {
+    padding: var(--space-md);
+  }
 }
