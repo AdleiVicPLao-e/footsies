@@ -34,36 +34,69 @@ export class GameRoom {
     console.log("Starting round robin tournament with players:", this.players);
     console.log("Initial scores:", Array.from(this.scores.entries()));
 
-    // Create games for all player combinations
-    for (let i = 0; i < this.players.length; i++) {
-      for (let j = i + 1; j < this.players.length; j++) {
-        const player1Name = this.players[i];
-        const player2Name = this.players[j];
+    const players = [...this.players];
 
-        // Get player objects from playerObjects Map instead of searching enemies
-        const player1 = this.playerObjects.get(player1Name);
-        const player2 = this.playerObjects.get(player2Name);
+    // Ensure even number of players (add a dummy "bye" if odd)
+    if (players.length % 2 !== 0) players.push("BYE");
+
+    const numRounds = players.length - 1;
+    const half = players.length / 2;
+
+    const schedule = [];
+
+    // Generate the balanced round-robin match schedule
+    for (let round = 0; round < numRounds; round++) {
+      const roundMatches = [];
+
+      for (let i = 0; i < half; i++) {
+        const p1 = players[i];
+        const p2 = players[players.length - 1 - i];
+
+        // Skip if a "BYE" is involved
+        if (p1 !== "BYE" && p2 !== "BYE") {
+          roundMatches.push([p1, p2]);
+        }
+      }
+
+      schedule.push(roundMatches);
+
+      // Rotate players (keep the first fixed)
+      const fixed = players[0];
+      const rest = players.slice(1);
+      rest.unshift(rest.pop()); // rotate last element to front
+      players.splice(1, players.length - 1, ...rest);
+    }
+
+    console.log("Generated Round Robin Schedule:", schedule);
+
+    // Create and store all Game objects in this.games based on schedule
+    for (let round = 0; round < schedule.length; round++) {
+      for (const [p1Name, p2Name] of schedule[round]) {
+        const player1 = this.playerObjects.get(p1Name);
+        const player2 = this.playerObjects.get(p2Name);
 
         if (!player1 || !player2) {
           console.error(
-            `Could not find player objects for: ${player1Name} or ${player2Name}`
+            `Could not find player objects for: ${p1Name} or ${p2Name}`
           );
           continue;
         }
 
-        // Create game with the actual player objects
         const game = new Game(player1, player2);
         this.games.push(game);
         console.log(
-          `Created game: ${player1Name} (${player1.cardDesign}) vs ${player2Name} (${player2.cardDesign})`
+          `Created Round ${round + 1} game: ${p1Name} (${
+            player1.cardDesign
+          }) vs ${p2Name} (${player2.cardDesign})`
         );
       }
     }
 
-    console.log(`Total games created: ${this.games.length}`);
+    console.log(`✅ Total games created: ${this.games.length}`);
 
     // Start first game
     if (this.games.length > 0) {
+      this.currentGameIndex = 0;
       this.games[this.currentGameIndex].startGame();
     }
   }
