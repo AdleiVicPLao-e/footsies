@@ -110,17 +110,61 @@ export class GameRoom {
     return false; // No more games
   }
 
-  recordWin(winnerName) {
-    console.log(`🔍 recordWin called for: ${winnerName}`);
+  recordWin(
+    winnerName,
+    loserName,
+    winnerHandValue = 0,
+    loserHandValue = 0,
+    isBlackjack = false,
+    isTie = false
+  ) {
+    console.log(`🔍 recordWin called for: ${winnerName} vs ${loserName}`);
     console.log(`📊 Before - scores:`, Array.from(this.scores.entries()));
 
-    if (winnerName) {
+    // Initialize streaks if needed
+    if (!this.streaks) this.streaks = new Map();
+
+    // --- Handle Tie Case ---
+    if (isTie) {
+      [winnerName, loserName].forEach((name) => {
+        const currentScore = this.scores.get(name) || 0;
+        this.scores.set(name, currentScore + 0.5);
+        this.streaks.set(name, 0); // reset streak
+      });
+      console.log(`🤝 Tie detected: ${winnerName} and ${loserName} both +0.5`);
+    }
+
+    // --- Handle Win Case ---
+    else if (winnerName && loserName) {
       const currentScore = this.scores.get(winnerName) || 0;
-      const newScore = currentScore + 1;
-      this.scores.set(winnerName, newScore);
-      console.log(`✅ ${winnerName}: ${currentScore} → ${newScore}`);
+      const currentStreak = this.streaks.get(winnerName) || 0;
+
+      // --- Calculate Win Margin ---
+      const margin = Math.max(0, winnerHandValue - loserHandValue);
+      let points = 1 + margin / 5;
+
+      // --- Add Blackjack Bonus ---
+      if (isBlackjack) points += 0.5;
+
+      // --- Apply Streak Multiplier ---
+      const newStreak = currentStreak + 1;
+      const streakBonus = 1 + newStreak * 0.05; // +5% per win
+      points *= streakBonus;
+
+      // --- Update Winner ---
+      this.scores.set(winnerName, currentScore + points);
+      this.streaks.set(winnerName, newStreak);
+
+      // --- Reset Loser Streak ---
+      if (this.streaks.has(loserName)) this.streaks.set(loserName, 0);
+
+      console.log(
+        `🏆 ${winnerName} beats ${loserName}: +${points.toFixed(
+          2
+        )} points (Margin ${margin}, Streak x${streakBonus.toFixed(2)})`
+      );
     } else {
-      console.log("❌ No winner name provided");
+      console.log("❌ Invalid winner/loser data");
     }
 
     console.log(`📊 After - scores:`, Array.from(this.scores.entries()));
